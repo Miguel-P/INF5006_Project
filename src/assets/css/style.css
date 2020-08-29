@@ -1,0 +1,40 @@
+
+.custom-bg-dark {
+    background-color: #373f46 !important
+}
+
+div#app-container {
+    background-color: black;
+    bottom: 96px;
+    top: 96px;
+    overflow: auto;
+    position: fixed;
+    padding: 2rem;
+    width: 100%;
+    color: white !important;
+}
+
+.jumbotron {
+    margin-bottom: 0;
+}
+
+footer#custom-footer {
+    height: 6rem;
+    background-color: #373f46;
+    font-size: 1rem;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white !important;
+}
+
+div#custom-home {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
