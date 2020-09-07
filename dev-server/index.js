@@ -1,10 +1,11 @@
 // Bring in the express package
-const express = require('express')
+import express from 'express';
+import {setEnvironment} from './api/config/env';
+import {connectToDB} from './api/config/db';
+import {registerRoutes} from './routes.js';
+
 const app = express() // instantiate a new express app
 const port = 3000
-import {registerRoutes} from './routes'
-import { setEnvironment } from './api/config/env';
-import { connectToDB} from './api/config/db'
 
 setEnvironment(app);
 connectToDB();
