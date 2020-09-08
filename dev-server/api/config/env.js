@@ -14,7 +14,12 @@ export function setEnvironment(app) {
 
 function setDevEnv(app) {
     process.env.NODE_ENV = 'development';
-    process.env.DB_URL = 'mongodb://127.0.0.1:27017'; // if you're not using wsl for dev and windows for mongo, use mongodb://localhost:27017
+    process.env.DB_DIALECT = 'mssql'; 
+    process.env.DB_URL = 'localhost'; 
+    process.env.DB_PORT = 1434; 
+    process.env.DB_NAME = 'AIFMRM_ERS'; 
+    process.env.DB_USERNAME = 'admin'; 
+    process.env.DB_PASSWORD = 'admin'; 
     console.log("Setting development environment");
     app.use(morgan('dev'));
     app.use(cors());
@@ -22,7 +27,12 @@ function setDevEnv(app) {
 }
 
 function  setProdEnv(app) {
-    process.env.DB_URL = 'mongodb://localhost:27017/vue-db';
+    process.env.DB_DIALECT = 'mssql'; 
+    process.env.DB_URL = 'localhost'; 
+    process.env.DB_PORT = 1434;
+    process.env.DB_NAME = 'AIFMRM_ERS'; 
+    process.env.DB_USERNAME = 'admin'; 
+    process.env.DB_PASSWORD = 'admin'; 
     app.use(bodyParser.json());
     app.use(morgan('dev'));
     app.use(cors());
