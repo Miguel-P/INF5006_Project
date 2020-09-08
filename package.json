@@ -4,16 +4,28 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "build": "xport NODE_ENV=production && nodemon prod-server/index.js && vue-cli-service build && babel dev-server --out-dir prod-server",
+    "lint": "vue-cli-service lint",
+    "dev": "concurrently \"babel dev-server --out-dir prod-server --watch\" \"nodemon prod-server/index.js\" \"npm run serve\" "
   },
   "dependencies": {
+    "@std/esm": "^0.26.0",
+    "bootstrap": "^4.5.2",
+    "concurrently": "^5.3.0",
     "core-js": "^3.6.5",
+    "cors": "^2.8.5",
+    "jquery": "^3.5.1",
+    "moment": "^2.27.0",
+    "mongoose": "^5.10.2",
+    "morgan": "^1.10.0",
+    "popper.js": "^1.16.1",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.4",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
