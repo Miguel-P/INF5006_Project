@@ -33,5 +33,14 @@ I have disabled lint for now.
 npm run lint
 ```
 
+# DB and MSSQL server setup
+
+- In MS Studio go to the server instance and go to security.
+- Create the user eg. admin and give password eg admin.
+- Go to 'user mappings' and map to the AIFMRM_ERS db.
+
+- Go to Server instance and right click, then click properties.
+- Then go to security and select 'SQL server' authentication.
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
