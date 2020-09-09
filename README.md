@@ -33,7 +33,7 @@ I have disabled lint for now.
 npm run lint
 ```
 
-# DB and MSSQL server setup
+### DB and MSSQL server setup
 
 - In MS Studio go to the server instance and go to security.
 - Create the user eg. admin and give password eg admin.
