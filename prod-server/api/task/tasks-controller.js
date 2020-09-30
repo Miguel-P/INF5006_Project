@@ -1,29 +1,13 @@
-"use strict";
-
-var _interopRequireDefault = require("/home/miguel/MPhil_Fintech/INF5006Z/Project/repo/mevn-stack/node_modules/@babel/runtime/helpers/interopRequireDefault");
-
-require("core-js/modules/es.array.find");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.index = index;
-exports.create = create;
-exports.update = update;
-exports.remove = remove;
-exports.show = show;
-
-var _userModel = _interopRequireDefault(require("../../model/user-model"));
-
-var _taskModel = _interopRequireDefault(require("../../model/task-model"));
-
-var _moment = _interopRequireDefault(require("moment"));
+import "core-js/modules/es.array.find";
+import User from '../../model/user-model';
+import Task from '../../model/task-model';
+import moment from 'moment';
 
 var StringUtil = require('../utilities/string-util');
 
-function index(req, res) {
+export function index(req, res) {
   // FIND ALL TASKS in database
-  _taskModel.default.find({}, function (error, tasks) {
+  Task.find({}, function (error, tasks) {
     if (error) {
       return res.status(500).json();
     }
@@ -32,13 +16,10 @@ function index(req, res) {
       tasks: tasks
     });
   }).populate('author', 'username', 'user'); // Populate will find the author that created the task and add it to the task (username only)
-
 }
-
-function create(req, res) {
+export function create(req, res) {
   var id = auth.getUserId(req);
-
-  _userModel.default.findOne({
+  User.findOne({
     _id: id
   }, function (error, user) {
     if (error && !user) {
@@ -46,9 +27,9 @@ function create(req, res) {
     } // actually creating an object that will go into the database
 
 
-    var task = new _taskModel.default(req.body.task);
+    var task = new Task(req.body.task);
     task.author = user._id;
-    task.dueDate = (0, _moment.default)(task.dueDate); // this is how to save something to the database with mongoose
+    task.dueDate = moment(task.dueDate); // this is how to save something to the database with mongoose
 
     task.save(function (error) {
       if (error) {
@@ -59,15 +40,12 @@ function create(req, res) {
     });
   });
 }
-
-function update(req, res) {
+export function update(req, res) {
   return res.status(204).json();
 }
-
-function remove(req, res) {
+export function remove(req, res) {
   return res.status(204).json();
 }
-
-function show(req, res) {
+export function show(req, res) {
   return res.status(200).json();
 }

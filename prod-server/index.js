@@ -1,20 +1,14 @@
-"use strict";
-
-var _routes = require("./routes");
-
-var _env = require("./api/config/env");
-
-var _db = require("./api/config/db");
-
 // Bring in the express package
-var express = require('express');
-
+import express from 'express';
+import { setEnvironment } from './api/config/env';
+import { connectToDB } from './api/config/db';
+import { registerRoutes } from './routes.js';
 var app = express(); // instantiate a new express app
 
 var port = 3000;
-(0, _env.setEnvironment)(app);
-(0, _db.connectToDB)();
-(0, _routes.registerRoutes)(app); // creating a route
+setEnvironment(app);
+connectToDB();
+registerRoutes(app); // creating a route
 
 app.get('/', function (req, res) {
   if (process.env.NODE_ENV !== 'production') {

@@ -30,8 +30,6 @@ def GetICsAndWeights(tbl,rDate,indexCode):
     weights = np.array(weights)
     weights = weights/sum(weights) #NOTE this normalizing won't work if their is a nan in weights
     
-
-    
     return IC, weights
 
 # assuming for specific mktIndexCode

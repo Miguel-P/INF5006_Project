@@ -1,14 +1,7 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.index = index;
-
 // import * as StringUtil from '../utilities/string-util.js';
 var StringUtil = require('../utilities/string-util');
 
-function index(req, res) {
+export function index(req, res) {
   var validation = validateIndex(req.body);
 
   if (!validation.isValid) {

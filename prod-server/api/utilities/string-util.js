@@ -1,8 +1,8 @@
 require("core-js/modules/es.string.trim");
 
-var _classCallCheck = require("/home/miguel/MPhil_Fintech/INF5006Z/Project/repo/mevn-stack/node_modules/@babel/runtime/helpers/classCallCheck");
+var _classCallCheck = require("C:/Users/Takunda/Desktop/Mphil_FinTech/INF5006S/Code/INF5006_Project/node_modules/@babel/runtime/helpers/classCallCheck");
 
-var _createClass = require("/home/miguel/MPhil_Fintech/INF5006Z/Project/repo/mevn-stack/node_modules/@babel/runtime/helpers/createClass");
+var _createClass = require("C:/Users/Takunda/Desktop/Mphil_FinTech/INF5006S/Code/INF5006_Project/node_modules/@babel/runtime/helpers/createClass");
 
 module.exports = /*#__PURE__*/function () {
   "use strict";

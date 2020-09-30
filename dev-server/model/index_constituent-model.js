@@ -1,11 +1,14 @@
 import {sequelize} from '../api/config/db';
 import DataTypes from 'sequelize';
-//const sequelize = new Sequelize({dialect: 'mssql'})
+import moment from 'moment';
 
 const IndexConstituent = sequelize.define('IndexConstituent', {
     Date: {
         primaryKey: true,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        get: function(fieldName) {
+            return moment.utc(this.getDataValue(fieldName)).format('YYYY-MM-DD')
+        }
     },
     Alpha: {
         primaryKey: true,
