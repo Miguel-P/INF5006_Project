@@ -1,6 +1,6 @@
 import {sequelize} from '../api/config/db';
 var IndexConstituentModel = require('../model/index_constituent-model').default;
-var IndexConstituentRep = require('./index_constituent-repository');
+var IndexConstituentRep = require('./index_constituent-repository').default;
 
 class Index {
     constructor(code) {
@@ -88,23 +88,24 @@ class Index {
         var results = {"success":0}
         var indexColumn = this.codeColumns[this.code]
         var indexAlternateCode = this.alternateCodes[this.code]
-        var constituent = null;
+        var constituent;
 
         await IndexConstituentModel.findOne({
             where: sequelize.literal(
-                " Date = '"+date+"' AND"+
+                " Date = '"+this.date+"' AND"+
                 " ["+indexColumn+"] = '"+indexAlternateCode+"' AND"+
                 " Alpha = '"+constituentCode+"'"
             )
         })
         .then(function(constituentModel) {
-            constituent = new IndexConstituent(constituentModel["Date"],constituentModel["Alpha"]);
+            constituent = new IndexConstituentRep(constituentModel["Date"],constituentModel["Alpha"]);
         }).catch(function (err) {
+            console.log("** 1 con data "+error)
             results["message"] = err
             return results
         });
 
-        await IndexConstituent.getConstituentData(indexCode, constituent)
+        await IndexConstituentRep.getConstituentData(this.code, constituent)
 
         results["success"] = 1
         results["message"] = "Success"

@@ -56,10 +56,9 @@
         },
         methods: {
             prepareConstituentData(constituentData){
-                var data = this.results
                 var constituentCode = constituentData["alpha"]
-
-                data["constituents"]["constituentCode"] = constituentData
+                console.log("** new constituent "+constituentCode)
+                this.results["constituents"][constituentCode] = constituentData
             },
             prepareIndexData() {
                 var data = this.results
@@ -73,8 +72,11 @@
                     constituentCodes.push({ value: constituent["alpha"], text: constituent["alpha"] })
                 }
                 this.constituentCodes=constituentCodes;
+
                 // Set the selected instrument defaults to the top one for now
                 this.constituentCode = firstKey
+                
+                //console.log("** top constituent "+firstKey)
 
                 var indexes = data["alternateCodes"]
                 var indexCodes = []
@@ -83,8 +85,11 @@
                     indexCodes.push({ value: indexCode, text: indexCode+" - "+index })
                 }
                 this.indexCodes=indexCodes;
-                // Set the selected index defaults to the top one for now
-                this.indexCode = indexCodes[0].value
+
+                if (!this.indexCode){
+                    // Set the selected index defaults to the top one for now
+                    this.indexCode = indexCodes[0].value
+                }
 
                 var periods = data["dates"]
                 var dates = []
@@ -93,8 +98,11 @@
                     dates.push({ value: period["Date"], text: period["Date"] })
                 }
                 this.dates=dates;
-                // Set the selected date defaults to the top one for now
-                this.date=dates[0].value
+
+                if (!this.date){
+                    // Set the selected date defaults to the top one for now
+                    this.date=dates[0].value
+                }
             },
             plotCapData(){
                 var data = this.results
@@ -141,7 +149,7 @@
                 var data = this.results
                 let indexCode = data["code"]
 
-                var key = Object.keys(data["constituents"])[0]
+                var key = this.constituentCode
                 let constituent = data["constituents"][key]
 
                 let equityData = constituent["EquityData"][this.date]
@@ -168,7 +176,12 @@
                     legend: {},
                     plot: {
                         tooltip: {
-                        text: "jhgf"
+                            text: "jhgf"
+                        },
+                        animation: {
+                            delay: 100,
+                            effect: "ANIMATION_UNFOLD_HORIZONTAL",
+                            speed: "10"
                         }
                     },
                     scale: {
@@ -201,16 +214,18 @@
                     return;
                 }
                 
+                console.log("** selected constituent "+this.constituentCode)
                 var constituent = data["constituents"][this.constituentCode]
                 var equityData = constituent["EquityData"]
-                if (this.date in constituent["EquityData"]){
+                if (equityData && this.date in equityData){
+                    console.log("** constituent data extists "+this.date )
                     this.plotReturns()
                 }else{
                     this.getConstituentData();
                 }
             },
             getIndexData(){
-                console.log("getting index data")
+                console.log("getting index data "+this.indexCode+" "+this.date)
                 axios.get(
                         'http://localhost:3000/api'+
                         '/indexes/'+this.indexCode+

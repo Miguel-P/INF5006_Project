@@ -1,7 +1,7 @@
 import { DateTime } from 'mssql';
 import {sequelize} from '../config/db';
 
-var IndexRep = require('../../repository/index-repository');
+var IndexRep = require('../../repository/index-repository').default;
 var IndexConstituent = require('../../model/index_constituent-model').default;
 const StringUtil = require('../utilities/string-util')
 

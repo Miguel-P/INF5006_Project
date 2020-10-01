@@ -123,4 +123,4 @@ class IndexConstituent {
     }
 }
 
-module.exports = IndexConstituent;
+export default IndexConstituent;
