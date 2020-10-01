@@ -194,15 +194,15 @@
                         }
                     },
                     title: {
-                        text: 'Equity and Index returns',
+                        text: indexCode+': Constituent and Index Returns',
                         padding: '15px',
                         fontColor: '#1E5D9E',
                         fontFamily: 'Lato',
                         fontSize: '20px'
                     },
                     series: [
-                        { values: equitySeries, text: "Equity Returns"},
-                        { values: indexSeries, text: "Index Returns"}
+                        { values: equitySeries, text: key+' Returns'},
+                        { values: indexSeries, text:  indexCode+' Returns'}
                     ]
                 }
             },
