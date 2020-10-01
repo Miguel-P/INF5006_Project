@@ -89,7 +89,7 @@ def CalcStats(weights, betas, mktVol, specVols):
     pfVol = np.sqrt(pfSysVol**2 + pfSpecVol**2)
     # D is the diagaonal matrix contaning the square root of the diags of totCov
     D = np.diag(np.sqrt(np.diag(totCov)))
-    CorrMat = np.linalg.inv(D)@totCov@np.linalg.inv(D)
+    CorrMat = np.linalg.pinv(D)@totCov@np.linalg.pinv(D) # using pseudoinverse so that no errors are thrown for singular matrices
     
     return pfBeta, sysCov, pfSysVol, specCov, pfSpecVol, totCov, pfVol, CorrMat, indx_nan
     
