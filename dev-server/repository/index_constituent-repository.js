@@ -49,7 +49,6 @@ class IndexConstituent {
         .then(function(equityData){
             constituent.EquityData = {}
             constituent.EquityData[constituent.date] = equityData;
-            constituent.calculateEquityReturns();
         })
         .catch(function (err) {
             console.log("*** error getting equity data: "+err);
@@ -59,11 +58,34 @@ class IndexConstituent {
         .then(function(equityData){
             constituent.IndexEquityData = {}
             constituent.IndexEquityData[constituent.date] = equityData;
-            constituent.calculateIndexEquityReturns();
         })
         .catch(function (err) {
             console.log("*** error getting index equity data: "+err);
         });
+
+        //constituent.trimEquityData(100)
+
+        constituent.calculateEquityReturns();
+        constituent.calculateIndexEquityReturns();
+    }
+
+    trimEquityData(number){
+        var trimmedEquityData = []
+        var trimmedIndexEquityData = []
+
+        var equityData = this.EquityData[this.date]
+        var indexEquityData = this.IndexEquityData[this.date]
+
+        var increment = Math.trunc(equityData.length/number);
+        var index = 0;
+        while (index <= equityData.length - 1){
+            trimmedEquityData.push(equityData[index])
+            trimmedIndexEquityData.push(indexEquityData[index])
+            index += increment
+        }
+
+        this.EquityData[this.date] = trimmedEquityData
+        this.IndexEquityData[this.date] = trimmedIndexEquityData
     }
 
     async getBetaData(indexCode) {
@@ -105,8 +127,11 @@ class IndexConstituent {
     }
 
     calculateEquityReturns(){
-        var equityData = this.EquityData[""+this.date]
+        var equityData = this.EquityData[this.date]
+        console.log("** p0 "+equityData.length+" "+JSON.stringify(equityData[0]["Price"]))
+        console.log("** p0 "+equityData.length+" "+JSON.stringify(equityData[equityData.length - 1]))
         var priceZero = equityData[equityData.length - 1]["Price"];
+        
         for (var i = 0; i < equityData.length; i++) {
             var returns  = ((equityData[i]["Price"] - priceZero)*100/priceZero).toFixed(2);
             equityData[i].Return = returns;
@@ -114,8 +139,9 @@ class IndexConstituent {
     }
 
     calculateIndexEquityReturns(){
-        var indexEquityData = this.IndexEquityData[""+this.date]
-        var priceZero = indexEquityData[indexEquityData.length - 1].Price;
+        var indexEquityData = this.IndexEquityData[this.date]
+        var priceZero = indexEquityData[indexEquityData.length - 1]["Price"];
+        console.log("** p00 "+priceZero)
         for (var i = 0; i < indexEquityData.length; i++) {
             var returns  = ((indexEquityData[i]["Price"] - priceZero)*100/priceZero).toFixed(2);
             indexEquityData[i].Return = returns;

@@ -158,6 +158,12 @@
                 let equityLabels = [], indexLabels = []
                 let equitySeries = [], indexSeries = []
 
+                let betaData = constituent["Beta"]
+                let alpha = parseFloat(betaData["Alpha"]).toFixed(5)
+                let beta = parseFloat(betaData["Beta"]).toFixed(5)
+                let totalRisk = parseFloat(betaData["TotalRisk"]).toFixed(5)
+                let uniqueRisk = parseFloat(betaData["UniqueRisk"]).toFixed(5)
+                
                 for (var i=equityData.length-1; i >= 0; i--) {
                     let equityReturn = parseFloat(equityData[i]["Return"])
                     let indexReturn = parseFloat(indexData[i]["Return"])
@@ -173,10 +179,22 @@
 
                 this.equityChartData = {
                     type: 'line',
-                    legend: {},
-                    plot: {
+                    legend: {
+                        header: {
+                            text: "Beta: "+beta+
+                            "\nAlpha: "+alpha+
+                            "\nTotal Risk: "+totalRisk+
+                            "\nUnique Risk: "+uniqueRisk
+                        }
+                    },
+                    'crosshair-x': {},
+                    "plot": {
                         tooltip: {
-                            text: "jhgf"
+                            visible: false
+                        },
+                        marker:{
+                            visible:false,
+                            size: '2px'
                         },
                         animation: {
                             delay: 100,
@@ -184,16 +202,13 @@
                             speed: "10"
                         }
                     },
-                    scale: {
-                        'size-factor': 0.9
-                    },
                     scaleX: {
                         label: {
                             text: 'Date',
                             fontSize: 16,
                         }
                     },
-                    title: {
+                    "title": {
                         text: indexCode+': Constituent and Index Returns',
                         padding: '15px',
                         fontColor: '#1E5D9E',
