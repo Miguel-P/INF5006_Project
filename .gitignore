@@ -2,7 +2,7 @@
 node_modules
 /dist
 /dev-server/dist
-
+prod-server
 
 # local env files
 .env.local
