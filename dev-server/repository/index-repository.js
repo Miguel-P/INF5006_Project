@@ -28,16 +28,17 @@ class Index {
 
     /**
      * The method will get constituents data for the index
-     * It also gets all the periods so that users can choose from UI
-     * @param {*} date 
+     * @param {*} date This is beta calculation date
+     * @param {*} period This is period from beta calculation to show equity data
      */
-    async getData(date) {
+    async getData(date, period) {
         var results = {"success":0};
         var code = this.code;
         var indexRep = this;
         var constituentModels;
 
         indexRep.date = date
+        indexRep.period = period
 
         // Get all periods
         await IndexConstituentModel.findAll({
@@ -77,14 +78,14 @@ class Index {
         // Gets the equity data of the consituent with biggest market share
         // Other constituents equity data can be obtained when user specifically selects on UI
         var key = Object.keys(indexRep.constituents)[0];
-        await IndexConstituentRep.getConstituentData(code, indexRep.constituents[key]);
+        await IndexConstituentRep.getConstituentData(code, indexRep.constituents[key], period);
 
         results["success"] = 1;
 
         return results;
     }
 
-    async getConstituentAndData(constituentCode) {
+    async getConstituentAndData(constituentCode, period) {
         var results = {"success":0}
         var indexColumn = this.codeColumns[this.code]
         var indexAlternateCode = this.alternateCodes[this.code]
@@ -105,7 +106,7 @@ class Index {
             return results
         });
 
-        await IndexConstituentRep.getConstituentData(this.code, constituent)
+        await IndexConstituentRep.getConstituentData(this.code, constituent, period)
 
         results["success"] = 1
         results["message"] = "Success"

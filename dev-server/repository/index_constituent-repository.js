@@ -35,7 +35,7 @@ class IndexConstituent {
         return constituents;
     }
 
-    static async getConstituentData(indexCode, constituent){
+    static async getConstituentData(indexCode, constituent, period){
         await constituent.getBetaData(indexCode)
         .then(function(beta) {
             //console.log("**** beta 1 ");
@@ -45,7 +45,7 @@ class IndexConstituent {
             console.log("*** error getting beta: "+err);
         });
         
-        await constituent.getEquityData()
+        await constituent.getEquityData(period)
         .then(function(equityData){
             constituent.EquityData = {}
             constituent.EquityData[constituent.date] = equityData;
@@ -54,7 +54,7 @@ class IndexConstituent {
             console.log("*** error getting equity data: "+err);
         });
 
-        await constituent.getIndexEquityData(indexCode)
+        await constituent.getIndexEquityData(indexCode, period)
         .then(function(equityData){
             constituent.IndexEquityData = {}
             constituent.IndexEquityData[constituent.date] = equityData;
@@ -63,7 +63,9 @@ class IndexConstituent {
             console.log("*** error getting index equity data: "+err);
         });
 
-        //constituent.trimEquityData(100)
+        // Return 200 data points equally spaced in the date range
+        // We do not want too much data being loaded
+        constituent.trimEquityData(200)
 
         constituent.calculateEquityReturns();
         constituent.calculateIndexEquityReturns();
@@ -76,7 +78,7 @@ class IndexConstituent {
         var equityData = this.EquityData[this.date]
         var indexEquityData = this.IndexEquityData[this.date]
 
-        var increment = Math.trunc(equityData.length/number);
+        var increment = Math.max(1,Math.trunc(equityData.length/number));
         var index = 0;
         while (index <= equityData.length - 1){
             trimmedEquityData.push(equityData[index])
@@ -100,27 +102,23 @@ class IndexConstituent {
         });
     }
 
-    async getEquityData() {
-        var startDate = this.Beta.StartDate;
-
+    async getEquityData(period) {
         return await EquityData.findAll({
             where: sequelize.literal(
-                " (Date  BETWEEN '"+startDate+"' AND '"+this.date+"') AND"+
-                " Instrument = '"+this.alpha+"' AND"+
-                " LOWER(DATENAME(dw, [Date]))='friday'"
+                " (Date BETWEEN DATEADD(MONTH,"+(-1 * period)+",'"+this.date+"') AND '"+this.date+"') AND"+
+                " Instrument = '"+this.alpha+"'"
+                //" LOWER(DATENAME(dw, [Date]))='friday'"
             ),
             order: [ [ 'Date', 'DESC' ]]
         })
-        
     }
 
-    async getIndexEquityData(indexCode) {
-        var startDate = this.Beta.StartDate;
+    async getIndexEquityData(indexCode, period) {
         return await EquityData.findAll({
             where: sequelize.literal(
-                " (Date  BETWEEN '"+startDate+"' AND '"+this.date+"') AND"+
-                " Instrument = '"+indexCode+"' AND"+
-                " LOWER(DATENAME(dw, [Date]))='friday'"
+                " (Date BETWEEN DATEADD(MONTH,"+(-1 * period)+",'"+this.date+"') AND '"+this.date+"') AND"+
+                " Instrument = '"+indexCode+"'"
+                //" LOWER(DATENAME(dw, [Date]))='friday'"
             ),
             order: [ [ 'Date', 'DESC' ]]
         })

@@ -28,6 +28,14 @@
                     </div>
 
                     <div class="w20">
+                        <model-select 
+                            :options="periods"
+                            v-model="period"
+                            placeholder="Select Period">
+                        </model-select>
+                    </div>
+
+                    <div class="w20">
                         <input type="button" value="Filter"  @click="filter()" class="btn btn-info w60"/>
                     </div>
                 </div>
@@ -76,8 +84,9 @@
                 // Set the selected instrument defaults to the top one for now
                 this.constituentCode = firstKey
                 
-                //console.log("** top constituent "+firstKey)
+                this.period = data["period"]
 
+                console.log("** top constituent "+firstKey+" period: "+this.period)
                 var indexes = data["alternateCodes"]
                 var indexCodes = []
                 for (var indexCode in indexes) {
@@ -164,6 +173,8 @@
                 let totalRisk = parseFloat(betaData["TotalRisk"]).toFixed(5)
                 let uniqueRisk = parseFloat(betaData["UniqueRisk"]).toFixed(5)
                 
+                console.log("consituent: "+key)
+
                 for (var i=equityData.length-1; i >= 0; i--) {
                     let equityReturn = parseFloat(equityData[i]["Return"])
                     let indexReturn = parseFloat(indexData[i]["Return"])
@@ -224,7 +235,9 @@
             filter: function(){
                 var data = this.results
 
-                if (this.indexCode !== data["code"] || this.date !== data["date"]){
+                if (this.indexCode !== data["code"] || 
+                    this.date !== data["date"] || 
+                    this.period !== data["period"]){
                     this.getIndexData()
                     return;
                 }
@@ -244,7 +257,8 @@
                 axios.get(
                         'http://localhost:3000/api'+
                         '/indexes/'+this.indexCode+
-                        '/date/'+this.date
+                        '/date/'+this.date+
+                        '/period/'+this.period
                 )
                 .then(response => {
                     console.log("got index data")
@@ -263,7 +277,9 @@
                         'http://localhost:3000/api'+
                         '/index_constituents/'+this.constituentCode+
                         '/index/'+this.indexCode+
-                        '/date/'+this.date)
+                        '/date/'+this.date+
+                        '/period/'+this.period
+                )
                 .then(response => {
                     console.log("got constituent data")
                     this.prepareConstituentData(response.data.results)
@@ -295,9 +311,17 @@
                 indexCodes: [],
                 constituentCodes: [],
                 dates: [],
+                periods: [
+                    {value: '1', text: '1 month'},
+                    {value: '6', text: '6 months'},
+                    {value: '12', text: '1 year'},
+                    {value: '60', text: '5 years'},
+                    {value: '120', text: '10 years'},
+                ],
                 indexCode: '',
                 constituentCode: '',
-                date: ''
+                date: '',
+                period: ''
             }
         },
         components: {

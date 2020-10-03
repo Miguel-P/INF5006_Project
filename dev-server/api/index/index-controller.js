@@ -13,7 +13,7 @@ export function get_all(req, res) {
     })
     .then(function(constituent) {
         var indexRep = new IndexRep("J203");
-        indexRep.getData(constituent.Date)
+        indexRep.getData(constituent.Date, 12)
         .then(function(results){
             if (results["success"] == 1){
                 return res.status(200).json({ results: indexRep });
@@ -33,9 +33,10 @@ export function get_all(req, res) {
 export function get_index(req, res) {
     var indexCode = req.params["indexCode"]
     var date = req.params["date"]
+    var period = parseInt(req.params["period"])
 
     var indexRep = new IndexRep(indexCode);
-    indexRep.getData(date)
+    indexRep.getData(date, period)
     .then(function(results){
         if (results["success"] == 1){
             return res.status(200).json({ results: indexRep });

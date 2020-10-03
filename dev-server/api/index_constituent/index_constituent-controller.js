@@ -20,10 +20,11 @@ export function get_constituent(req, res) {
     var constituentCode = req.params["constituentCode"]
     var indexCode = req.params["indexCode"]
     var date = req.params["date"]
+    var period = req.params["period"]
 
     var indexRep = new IndexRep(indexCode)
     indexRep.date = date
-    indexRep.getConstituentAndData(constituentCode, indexCode, date)
+    indexRep.getConstituentAndData(constituentCode, period)
     .then(function(results){
         if (results["success"] == 1) {
             return res.status(200).json({ results: results["data"] });
