@@ -1,10 +1,5 @@
 <template>
   <div id="app">
-    <ul v-if="errors && errors.length">
-      <li v-for="error of errors"  v-bind:key="error">
-        {{error.message}}
-      </li>
-    </ul>
     <sidebar-menu
         :menu="menu"
         :show-one-child="true"
@@ -30,6 +25,9 @@
         console.log('onItemClick')
         console.log(event)
         console.log(item)
+      },
+      filter: function() {
+        console.log("add name")
       }
     },
     data() {

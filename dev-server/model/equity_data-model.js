@@ -2,7 +2,7 @@ import {sequelize} from '../api/config/db';
 import DataTypes from 'sequelize';
 import moment from 'moment';
 
-const IndexConstituent = sequelize.define('IndexConstituent', {
+const EquityData = sequelize.define('EquityData', {
     Date: {
         primaryKey: true,
         type: DataTypes.DATE,
@@ -10,26 +10,29 @@ const IndexConstituent = sequelize.define('IndexConstituent', {
             return moment.utc(this.getDataValue(fieldName)).format('YYYY-MM-DD')
         }
     },
-    Alpha: {
+    InstrumentCode: {
         primaryKey: true,
+        field: 'Instrument',
         type: DataTypes.STRING,
         allowNull: false
     },
-    Instrument: {
-        type: DataTypes.STRING,
+    Price: {
+        type: DataTypes.FLOAT,
         allowNull: false
     },
-    Gross_Market_Capitalisation: {
-        field: 'Gross Market Capitalisation',
-        type: DataTypes.FLOAT
+    Volume: {
+        type: DataTypes.FLOAT,
+        allowNull: false
     },
-    Cumulative_Market_Capitalisation: {
-        field: 'Cumulative Market Capitalisation',
-        type: DataTypes.FLOAT
-    }
+    Return: {
+        type: DataTypes.VIRTUAL,
+        set(value) {
+            this.setDataValue("Return",value);
+        }
+      }
 }, {
-    tableName: 'tbl_Index_Constituents',
+    tableName: 'tbl_EOD_Equity_Data',
     timestamps: false
 });
 
-export default IndexConstituent;
+export default EquityData;
