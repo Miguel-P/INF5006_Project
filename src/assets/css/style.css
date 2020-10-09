@@ -3,15 +3,16 @@
     background-color: #373f46 !important
 }
 
+#app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+  }
+
 div#app-container {
-    background-color: black;
-    bottom: 96px;
-    top: 96px;
-    overflow: auto;
-    position: fixed;
-    padding: 2rem;
-    width: 100%;
-    color: white !important;
+    margin: 1.5em;
 }
 
 .jumbotron {
@@ -37,4 +38,8 @@ div#custom-home {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.nav-logo {
+    height: 30px;
 }
