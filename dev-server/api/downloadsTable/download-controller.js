@@ -45,7 +45,7 @@ export function get_sharetable(req, res) {
         where: sequelize.literal(
             " \"Instrument\" NOT IN (:indexes) AND"+
             " \"Index\" = '" + proxy + "' AND" +
-            " (Date BETWEEN DATEADD(MONTH,"+(-1 * period)+",'"+date+"') AND '"+date+"')"
+            " (Date BETWEEN DATEADD(MONTH,"+(-1 * period)+",'"+date+"') AND DATEADD(DAY,"+1+",'"+date+"'))"
         ),
         replacements: {indexes: allIndexNames},
         order: [ [ 'Date', 'DESC' ]]
@@ -58,7 +58,7 @@ export function get_sharetable(req, res) {
 }
 
 export function get_dates(req, res) {
-    FullBetaModel.sequelize.query('SELECT distinct "Date" from tbl_BA_Beta_Output', {
+    FullBetaModel.sequelize.query('SELECT distinct "Date" from tbl_BA_Beta_Output order by "Date" desc', {
             type: FullBetaModel.sequelize.QueryTypes.SELECT
     })
     .then(function(results) {
