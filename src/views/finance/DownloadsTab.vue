@@ -40,6 +40,10 @@
                     <div class="w20">
                             <input type="button" value="Create Table"  @click="createTable()" class="btn btn-info w60"/>
                     </div>
+                    <div class="w20">
+                            <!-- <button type="submit" onclick="window.open('file.csv')">Download!</button> -->
+                            <input type="button" value="Download Table"  @click="downloadTable()" class="btn btn-info w60"/>
+                    </div>
                 <zing-grid :data.prop="gridData" filter sort pager></zing-grid>
              </div>
         </div>
@@ -59,6 +63,26 @@
             Sidebar
         },
         methods: {
+            downloadTable: function() {
+                console.log("Downloading table")
+                var csv = this.arrayToCSV(this.gridData)
+                console.log("csv cotents: ", csv)
+                var hiddenElement = document.createElement('a');
+                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+                hiddenElement.target = '_blank';
+                hiddenElement.download = this.table+"_"+this.date+"_period"+this.period+'.csv';
+                hiddenElement.click();
+            },
+
+            arrayToCSV: function(objArray) {
+                const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
+                let str = `${Object.keys(array[0]).map(value => `"${value}"`).join(",")}` + '\r\n';
+
+                return array.reduce((str, next) => {
+                    str += `${Object.values(next).map(value => `"${value}"`).join(",")}` + '\r\n';
+                    return str;
+                    }, str);
+            },
             
             createTable: function(){
                 axios.get(
