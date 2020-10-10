@@ -1,0 +1,69 @@
+import { DateTime } from 'mssql';
+import {sequelize} from '../config/db';
+const { Op } = require("sequelize");
+
+var FullBetaModel = require('../../model/full-beta-model').default;
+const allIndexNames = require('../utilities/index-names')
+
+export function get_all(req, res) {
+    // First find most recent date in the constituents
+    FullBetaModel.findAll({
+        where: {Instrument: {[Op.notIn]: allIndexNames}}
+    })
+    .then(function(results) {
+        return res.status(200).json({message: results});
+    }).catch(function (err) {
+        return res.status(400).json({ error: err.message});
+    });
+}
+
+export function get_indextable(req, res) {
+    var proxy = req.params["proxy"]
+    var date = req.params["date"]
+    var period = req.params["period"]
+    FullBetaModel.findAll({
+        where: sequelize.literal(
+            " \"Instrument\" NOT IN (:indexes) AND"+
+            " \"Index\" = '" + proxy + "' AND" +
+            " (Date BETWEEN DATEADD(MONTH,"+(-1 * period)+",'"+date+"') AND '"+date+"')"
+        ),
+        replacements: {indexes: allIndexNames},
+        order: [ [ 'Date', 'DESC' ]]
+    })
+    .then(function(results) {
+        return res.status(200).json({message: results});
+    }).catch(function (err) {
+        return res.status(400).json({ error: err.message});
+    });
+}
+
+export function get_sharetable(req, res) {
+    var proxy = req.params["proxy"]
+    var date = req.params["date"]
+    var period = req.params["period"]
+    FullBetaModel.findAll({
+        where: sequelize.literal(
+            " \"Instrument\" NOT IN (:indexes) AND"+
+            " \"Index\" = '" + proxy + "' AND" +
+            " (Date BETWEEN DATEADD(MONTH,"+(-1 * period)+",'"+date+"') AND '"+date+"')"
+        ),
+        replacements: {indexes: allIndexNames},
+        order: [ [ 'Date', 'DESC' ]]
+    })
+    .then(function(results) {
+        return res.status(200).json({message: results});
+    }).catch(function (err) {
+        return res.status(400).json({ error: err.message});
+    });
+}
+
+export function get_dates(req, res) {
+    FullBetaModel.sequelize.query('SELECT distinct "Date" from tbl_BA_Beta_Output', {
+            type: FullBetaModel.sequelize.QueryTypes.SELECT
+    })
+    .then(function(results) {
+        return res.status(200).json({message: results});
+    }).catch(function (err) {
+        return res.status(400).json({ error: err.message});
+    });
+}
