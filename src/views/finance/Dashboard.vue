@@ -16,7 +16,7 @@
                         </model-select>
                     </div>
 
-                    <div class="w20">  
+                    <div class="w20">
                         <model-select 
                             :options="constituentCodes"
                             v-model="constituentCode"
