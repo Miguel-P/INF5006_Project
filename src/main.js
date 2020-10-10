@@ -9,6 +9,7 @@ import ZingGrid from 'zinggrid'
 import VueRouter from 'vue-router'
 
 import Dashboard from './views/finance/Dashboard.vue'
+import DownloadsTab from './views/finance/DownloadsTab.vue'
 
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import 'vue-search-select/dist/VueSearchSelect.css'
@@ -16,6 +17,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+
+import router from './router'
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
@@ -25,15 +28,20 @@ Vue.component('zinggrid', ZingGrid)
 Vue.component('zingchart', ZingChartVue)
 Vue.config.productionTip = false
 
-const router = new VueRouter({
-  routes: [
-    {
-      path: '/',
-      name: 'Dashboard',
-      component: Dashboard
-    }
-  ]
-})
+// const router = new VueRouter({
+//   routes: [
+//     {
+//       path: '/',
+//       name: 'Home',
+//       component: Dashboard
+//     },
+//     {
+//       path: '/downloads',
+//       name: 'Downloads',
+//       component: DownloadsTab
+//     }
+//   ]
+// })
 
 new Vue({
   router,
