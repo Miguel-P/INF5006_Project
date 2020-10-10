@@ -1,5 +1,7 @@
-var Beta = require('../model/beta-model').default;
-var EquityData = require('../model/equity_data-model').default;
+var BetaModel = require('../model/beta-model').default;
+var SubSectorModel = require('../model/sub_sector-model').default;
+var EquityDataModel = require('../model/equity_data-model').default;
+var IndexConstituentModel = require('../model/index_constituent-model').default;
 
 import {sequelize} from '../api/config/db';
 
@@ -9,6 +11,96 @@ class IndexConstituent {
       this.date = date;
       this.alpha = alpha;
       this.weight = 0;
+    }
+
+    static async getConstituentBetaData(date){
+        var results = {"success":0};
+        results["data"] = {}
+        var betaAttributes = ['StartDate','Date','IndexCode','Beta','DataPoints','DaysTraded']
+        var betaDates;
+        
+        // Get all dates
+        await BetaModel.findAll({
+            attributes: [[sequelize.fn('DISTINCT', sequelize.col('Date')), 'Date']],
+            order: [ [ 'Date', 'DESC' ]]
+        })
+        .then(function(dates){
+            console.log("**** index rep dates "+dates.length);
+            betaDates = dates;
+        })
+        .catch(function (err) {
+            results["message"] = err;
+            console.log("*** dates error "+err)
+        });
+
+        await IndexConstituentModel.findAll({
+            include: [
+                {model: SubSectorModel, as: 'ICBSubSector'},
+                {model: BetaModel, attributes: betaAttributes, required: true}
+            ],
+            where: sequelize.literal
+            (
+                " MONTH([Beta].[Date]) = MONTH('"+date+"') AND YEAR([Beta].[Date]) = YEAR('"+date+"') AND"+
+                " MONTH([IndexConstituent].[Date]) = MONTH('"+date+"') AND YEAR([IndexConstituent].[Date]) = YEAR('"+date+"')"
+            )
+        })
+        .then(function(constituentBetaModels){
+            console.log("** beta data "+constituentBetaModels.length);
+            
+            var constituentBetas = IndexConstituent.prepareConstituentBetaData(constituentBetaModels)
+
+            results["success"] = 1
+            results["message"] = "Successful"
+            results["data"]["dates"] = betaDates
+            results["data"]["betas"] = constituentBetas
+        }).catch(function (err) {
+            console.log("*** error beta data: "+err);
+            results["message"] = err
+        });
+
+        return results
+    }
+
+    /**
+     * Each constituent will have an array of betas (each for a different index) for the date that was passed
+     * This methods gets those betas and makes one entry that has all the betas
+     * @param {*} constituentBetaModels 
+     */
+    static prepareConstituentBetaData(constituentBetaModels){
+
+        var constituentBetas = {}
+
+        console.log('** cbm: '+JSON.stringify(constituentBetaModels[0]))
+        for (var i = 0; i < constituentBetaModels.length; i++) {
+            var code = constituentBetaModels[i]['Alpha'];
+            var name = constituentBetaModels[i]['Instrument'];
+            var betaModels = constituentBetaModels[i]['Beta'];
+            var subSectors = constituentBetaModels[i]['ICBSubSector']
+
+            constituentBetas[code] = {}
+            constituentBetas[code]['InstrumentCode'] = code
+            constituentBetas[code]['InstrumentName'] = name
+            constituentBetas[code]['StartDate'] = betaModels[0]['StartDate']
+            constituentBetas[code]['Date'] = betaModels[0]['Date']
+            constituentBetas[code]['DataPoints'] = betaModels[0]['DataPoints']
+            constituentBetas[code]['DaysTraded'] = betaModels[0]['DaysTraded']
+            constituentBetas[code]['SubSectorCode'] = subSectors['SubSectorCode']
+            constituentBetas[code]['SubSector'] = subSectors['SubSector']
+            constituentBetas[code]['IndustryCode'] = subSectors['IndustryCode']
+            constituentBetas[code]['Industry'] = subSectors['Industry']
+            constituentBetas[code]['SuperSectorCode'] = subSectors['SuperSectorCode']
+            constituentBetas[code]['SuperSector'] = subSectors['SuperSector']
+            constituentBetas[code]['SectorCode'] = subSectors['SectorCode']
+            constituentBetas[code]['Sector'] = subSectors['Sector']
+
+            for (var j = 0; j < betaModels.length; j++){
+                var betaModel = betaModels[j];
+                var index = betaModel['IndexCode']
+                constituentBetas[code][index] = betaModel['Beta']
+            }
+        }
+
+        return Object.values(constituentBetas)
     }
 
     static getConstituents(constituentModels) {
@@ -78,6 +170,17 @@ class IndexConstituent {
         var equityData = this.EquityData[this.date]
         var indexEquityData = this.IndexEquityData[this.date]
 
+        // If an index only started being recorded recently
+        // The share data should match that otherwise we cant make reasonable comparisons
+        if (equityData.length !== indexEquityData.length){
+            var min = Math.min(equityData.length, indexEquityData.length)
+            equityData = equityData.slice(0, min);
+            indexEquityData = indexEquityData.slice(0, min);
+
+            this.EquityData[this.date] = equityData
+            this.IndexEquityData[this.date] = indexEquityData
+        }
+
         var increment = Math.max(1,Math.trunc(equityData.length/number));
         var index = 0;
         while (index <= equityData.length - 1){
@@ -92,7 +195,7 @@ class IndexConstituent {
 
     async getBetaData(indexCode) {
         //var transaction = await sequelize.transaction();
-        return await Beta.findOne({
+        return await BetaModel.findOne({
             where: sequelize.literal(
                 " MONTH([Date]) = MONTH('"+this.date+"') AND"+
                 " YEAR([Date]) = YEAR('"+this.date+"') AND"+
@@ -103,7 +206,7 @@ class IndexConstituent {
     }
 
     async getEquityData(period) {
-        return await EquityData.findAll({
+        return await EquityDataModel.findAll({
             where: sequelize.literal(
                 " (Date BETWEEN DATEADD(MONTH,"+(-1 * period)+",'"+this.date+"') AND '"+this.date+"') AND"+
                 " Instrument = '"+this.alpha+"'"
@@ -114,7 +217,7 @@ class IndexConstituent {
     }
 
     async getIndexEquityData(indexCode, period) {
-        return await EquityData.findAll({
+        return await EquityDataModel.findAll({
             where: sequelize.literal(
                 " (Date BETWEEN DATEADD(MONTH,"+(-1 * period)+",'"+this.date+"') AND '"+this.date+"') AND"+
                 " Instrument = '"+indexCode+"'"
@@ -138,8 +241,9 @@ class IndexConstituent {
 
     calculateIndexEquityReturns(){
         var indexEquityData = this.IndexEquityData[this.date]
+        console.log("** p00 "+indexEquityData.length+" "+JSON.stringify(indexEquityData[0]["Price"]))
+        console.log("** p00 "+indexEquityData.length+" "+JSON.stringify(indexEquityData[indexEquityData.length - 1]))
         var priceZero = indexEquityData[indexEquityData.length - 1]["Price"];
-        console.log("** p00 "+priceZero)
         for (var i = 0; i < indexEquityData.length; i++) {
             var returns  = ((indexEquityData[i]["Price"] - priceZero)*100/priceZero).toFixed(2);
             indexEquityData[i].Return = returns;

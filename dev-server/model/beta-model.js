@@ -47,6 +47,14 @@ const Beta = sequelize.define('Beta', {
         field: 'Unique Risk',
         type: DataTypes.FLOAT,
         allowNull: false
+    },
+    DaysTraded: {
+        field: '% Days Traded',
+        type: DataTypes.FLOAT
+    },
+    DataPoints: {
+        field: 'Data Points',
+        type: DataTypes.INTEGER
     }
 }, {
     tableName: 'tbl_BA_Beta_Output',

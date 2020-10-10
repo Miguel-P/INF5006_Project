@@ -2,11 +2,12 @@ import { DateTime } from 'mssql';
 import {sequelize} from '../config/db';
 
 var IndexRep = require('../../repository/index-repository').default;
-var IndexConstituent = require('../../model/index_constituent-model').default;
+var IndexConstituentRep = require('../../repository/index_constituent-repository').default;
+var IndexConstituentModel = require('../../model/index_constituent-model').default;
 const StringUtil = require('../utilities/string-util')
 
 export function get_all(req, res) {
-    IndexConstituent.findOne({
+    IndexConstituentModel.findOne({
         order: [ [ 'Date', 'DESC' ]]
     })
     .then(function(constituent) {
@@ -37,7 +38,7 @@ export function get_constituent(req, res) {
 }
 
 function get_for_date(res, date) {
-    IndexConstituent.findAll({
+    IndexConstituentModel.findAll({
         where: sequelize.literal(" Date = '"+date+"'")
     })
     .then(function(constituents){
@@ -46,3 +47,20 @@ function get_for_date(res, date) {
         return res.status(400).json({ error: err.message});
     });
 }
+
+export function get_constituent_beta_data(req, res) {
+    var date = req.params["date"]
+
+    IndexConstituentRep.getConstituentBetaData(date)
+    .then(function(results){
+        if (results["success"] == 1) {
+            return res.status(200).json({ results: results["data"] });
+        }
+        return res.status(400).json({ error: results["message"] });
+    })
+    .catch(function (err) {
+        console.log("** cont err 1 "+err)
+        return res.status(400).json({ error: err });
+    });
+}
+
