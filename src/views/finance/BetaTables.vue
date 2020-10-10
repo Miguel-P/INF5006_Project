@@ -6,7 +6,18 @@
             </div>
         </div>
         <div class="horizontal-no-margin">
-
+            <div class="horizontal w100">
+                <div class="w20">
+                    <model-select 
+                        :options="dates"
+                        v-model="date"
+                        placeholder="Select Period">
+                    </model-select>
+                </div>
+                <div class="w20">
+                    <input type="button" value="Get Data"  @click="getBetaData()" class="btn btn-info w60"/>
+                </div>
+            </div>
             <zing-grid 
                 caption="Share Betas"
                 draggable="columns" 
@@ -17,6 +28,8 @@
                 sort>
                 <zg-colgroup>
                     <zg-column index="InstrumentCode" filter="disabled" sort="disabled"></zg-column>
+                    <zg-column index="FirstTrade" filter="disabled" sort="disabled" width="150"></zg-column>
+                    <zg-column index="LastTrade" filter="disabled" sort="disabled" width="150"></zg-column>
                     <zg-column index="J200" filter="disabled" cell-class="betaCellFunction"></zg-column>
                     <zg-column index="J203" filter="disabled" cell-class="betaCellFunction"></zg-column>
                     <zg-column index="J250" filter="disabled" cell-class="betaCellFunction"></zg-column>
@@ -71,6 +84,9 @@
                     dates.push({ value: period["Date"], text: period["Date"] })
                 }
                 this.dates=dates;
+                if (!this.date){
+                    this.date=dates[0].value
+                }
 
                 this.sharesBetaData = data["betas"]
 
@@ -91,6 +107,24 @@
                 let uniqueSubSectors = Array.from(new Set(subSectorValues))
                 this.subSectors = JSON.stringify(uniqueSubSectors)
             },
+            getBetaData(){
+                this.loading = true
+                axios.get(
+                    'http://localhost:3000/api'+
+                    '/index_constituents'+
+                    '/betas'+
+                    '/date/'+this.date
+                )
+                .then(response => {
+                    this.results = response.data.results
+                    this.prepareData()
+                    this.loading = false
+                })
+                .catch(e => {
+                    this.loading = false
+                    console.log(e)
+                })
+            }
         },
         created () {
             this.loading = true
@@ -114,8 +148,8 @@
                 sectors: '',
                 subSectors: '',
                 sharesBetaData: {},
-                dates: {},
-                zinggrid: null
+                dates: [],
+                date: ''
             }
         },
         components: {
