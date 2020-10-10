@@ -37,12 +37,14 @@
                             </model-select>
                         </div>
                     </div>
-                    <div class="w20">
+                    <div class="w100">
+                        <div class="w20">
                             <input type="button" value="Create Table"  @click="createTable()" class="btn btn-info w60"/>
-                    </div>
-                    <div class="w20">
-                            <!-- <button type="submit" onclick="window.open('file.csv')">Download!</button> -->
-                            <input type="button" value="Download Table"  @click="downloadTable()" class="btn btn-info w60"/>
+                        </div>
+                        <div class="w20">
+                                <!-- <button type="submit" onclick="window.open('file.csv')">Download!</button> -->
+                                <input type="button" value="Download Table"  @click="downloadTable()" class="btn btn-info w60"/>
+                        </div>
                     </div>
                 <zing-grid :data.prop="gridData" filter sort pager></zing-grid>
              </div>

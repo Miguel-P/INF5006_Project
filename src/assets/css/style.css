@@ -46,6 +46,7 @@ div#custom-home {
 
 .w100 {
     width: 100%;
+    margin: 1em;
 }
 
 .w60 {
@@ -73,3 +74,16 @@ div#custom-home {
 .horizontal-no-margin div {
     display: inline-block;
 }
+
+.fcontainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+  
+.fitem {
+    flex: 0 22%;
+    height: 100px;
+    margin-bottom: 2%; /* (100-32*3)/2 */
+}
+  
