@@ -1,58 +1,56 @@
 <template>
     <div id="app">
-        <div class="loader" v-if="loading">
-            <div>
-                <circle9></circle9>
-            </div>
-        </div>
-        <div class="horizontal-no-margin">
-            <div class="w60">
-                <div class="horizontal w100">
-                    <div class="w20">
-                        <model-select
-                            :options="indexCodes"
-                            v-model="indexCode"
-                            placeholder="Select Index">
-                        </model-select>
+        <Navbar/>
+        <Sidebar/>
+        <div id="app-container">
+            <div class="horizontal-no-margin">
+                <div class="w60">
+                    <div class="horizontal w100">
+                        <div class="w20">
+                            <model-select
+                                :options="indexCodes"
+                                v-model="indexCode"
+                                placeholder="Select Index">
+                            </model-select>
+                        </div>
+
+                        <div class="w20">  
+                            <model-select 
+                                :options="constituentCodes"
+                                v-model="constituentCode"
+                                placeholder="Select Instrument">
+                            </model-select>
+                        </div>
+
+                        <div class="w20">
+                            <model-select 
+                                :options="dates"
+                                v-model="date"
+                                placeholder="Select Date">
+                            </model-select>
+                        </div>
+
+                        <div class="w20">
+                            <model-select 
+                                :options="periods"
+                                v-model="period"
+                                placeholder="Select Period">
+                            </model-select>
+                        </div>
+
+                        <div class="w20">
+                            <input type="button" value="Filter"  @click="filter()" class="btn btn-info w60"/>
+                        </div>
                     </div>
 
-                    <div class="w20">  
-                        <model-select 
-                            :options="constituentCodes"
-                            v-model="constituentCode"
-                            placeholder="Select Instrument">
-                        </model-select>
-                    </div>
-
-                    <div class="w20">
-                        <model-select 
-                            :options="dates"
-                            v-model="date"
-                            placeholder="Select Date">
-                        </model-select>
-                    </div>
-
-                    <div class="w20">
-                        <model-select 
-                            :options="periods"
-                            v-model="period"
-                            placeholder="Select Period">
-                        </model-select>
-                    </div>
-
-                    <div class="w20">
-                        <input type="button" value="Filter"  @click="filter()" class="btn btn-info w60"/>
+                    <div class="w100">
+                        <zingchart :data="equityChartData"></zingchart>
                     </div>
                 </div>
-
-                <div class="w100">
-                    <zingchart :id="equityChartId" :data="equityChartData"></zingchart>
+                <div class="w40">
+                    <zingchart :data="capChartData"></zingchart>
                 </div>
-            </div>
-
-            <div class="w40">
-                <zingchart :id="capChartId" :data="capChartData"></zingchart>
-            </div>
+             </div>
         </div>
     </div>
 </template>
@@ -60,13 +58,14 @@
 <script>
     import axios from 'axios';
     import { ModelSelect } from 'vue-search-select'
-    import {Circle9} from 'vue-loading-spinner'
+    import Navbar from '@/components/Navbar'
+    import Sidebar from '@/components/Sidebar'
 
     export default {
-        props: {
-            data: {
-                type: Object
-            }
+        components: {
+            ModelSelect,
+            Navbar,
+            Sidebar
         },
         methods: {
             prepareConstituentData(constituentData){
@@ -400,10 +399,6 @@
                 date: '',
                 period: ''
             }
-        },
-        components: {
-            ModelSelect,
-            Circle9
         }
     }
 </script>

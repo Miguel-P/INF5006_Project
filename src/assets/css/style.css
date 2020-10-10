@@ -3,15 +3,16 @@
     background-color: #373f46 !important
 }
 
+#app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+  }
+
 div#app-container {
-    background-color: black;
-    bottom: 96px;
-    top: 96px;
-    overflow: auto;
-    position: fixed;
-    padding: 2rem;
-    width: 100%;
-    color: white !important;
+    margin: 1.5em;
 }
 
 .jumbotron {
@@ -38,3 +39,51 @@ div#custom-home {
     justify-content: center;
     align-items: center;
 }
+
+.nav-logo {
+    height: 30px;
+}
+
+.w100 {
+    width: 100%;
+    margin: 1em;
+}
+
+.w60 {
+    width: 60%;
+}
+
+.w40 {
+    width: 40%;
+}
+
+.w20 {
+    width: 20%;
+}
+
+.w30 {
+    width: 30%;
+    padding: 5px;
+}
+
+.horizontal div {
+    display: inline-block;
+    margin: 2px;
+}
+
+.horizontal-no-margin div {
+    display: inline-block;
+}
+
+.fcontainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+  
+.fitem {
+    flex: 0 22%;
+    height: 100px;
+    margin-bottom: 2%; /* (100-32*3)/2 */
+}
+  
