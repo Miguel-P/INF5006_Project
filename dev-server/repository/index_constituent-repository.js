@@ -25,13 +25,17 @@ class IndexConstituent {
             order: [ [ 'Date', 'DESC' ]]
         })
         .then(function(dates){
-            console.log("**** index rep dates "+dates.length);
+            console.log("**** index rep dates "+JSON.stringify(dates));
             betaDates = dates;
         })
         .catch(function (err) {
             results["message"] = err;
             console.log("*** dates error "+err)
         });
+
+        if (date === undefined) {
+            date = betaDates[0]['Date']
+        }
 
         await IndexConstituentModel.findAll({
             include: [
@@ -70,7 +74,7 @@ class IndexConstituent {
 
         var constituentBetas = {}
 
-        console.log('** cbm: '+JSON.stringify(constituentBetaModels[0]))
+        //console.log('** cbm: '+JSON.stringify(constituentBetaModels[0]))
         for (var i = 0; i < constituentBetaModels.length; i++) {
             var code = constituentBetaModels[i]['Alpha'];
             var name = constituentBetaModels[i]['Instrument'];
@@ -80,24 +84,25 @@ class IndexConstituent {
             constituentBetas[code] = {}
             constituentBetas[code]['InstrumentCode'] = code
             constituentBetas[code]['InstrumentName'] = name
-            constituentBetas[code]['StartDate'] = betaModels[0]['StartDate']
-            constituentBetas[code]['Date'] = betaModels[0]['Date']
-            constituentBetas[code]['DataPoints'] = betaModels[0]['DataPoints']
-            constituentBetas[code]['DaysTraded'] = betaModels[0]['DaysTraded']
-            constituentBetas[code]['SubSectorCode'] = subSectors['SubSectorCode']
-            constituentBetas[code]['SubSector'] = subSectors['SubSector']
-            constituentBetas[code]['IndustryCode'] = subSectors['IndustryCode']
             constituentBetas[code]['Industry'] = subSectors['Industry']
-            constituentBetas[code]['SuperSectorCode'] = subSectors['SuperSectorCode']
             constituentBetas[code]['SuperSector'] = subSectors['SuperSector']
-            constituentBetas[code]['SectorCode'] = subSectors['SectorCode']
             constituentBetas[code]['Sector'] = subSectors['Sector']
+            constituentBetas[code]['SubSector'] = subSectors['SubSector']
 
             for (var j = 0; j < betaModels.length; j++){
                 var betaModel = betaModels[j];
                 var index = betaModel['IndexCode']
-                constituentBetas[code][index] = betaModel['Beta']
+                constituentBetas[code][index] = parseFloat(betaModel['Beta']).toFixed(2)
             }
+
+            constituentBetas[code]['FirstTrade'] = betaModels[0]['StartDate']
+            constituentBetas[code]['LastTrade'] = betaModels[0]['Date']
+            constituentBetas[code]['DataPoints'] = betaModels[0]['DataPoints']
+            constituentBetas[code]['DaysTraded'] = parseFloat(betaModels[0]['DaysTraded']).toFixed(2)
+            constituentBetas[code]['SubSectorCode'] = subSectors['SubSectorCode']
+            constituentBetas[code]['IndustryCode'] = subSectors['IndustryCode']
+            constituentBetas[code]['SuperSectorCode'] = subSectors['SuperSectorCode']
+            constituentBetas[code]['SectorCode'] = subSectors['SectorCode']
         }
 
         return Object.values(constituentBetas)
@@ -115,7 +120,7 @@ class IndexConstituent {
             constituents[constituentModel["Alpha"]] = constituent;
         }
 
-        console.log("*** totalCap "+totalCap);
+        //console.log("*** totalCap "+totalCap);
         // put in the weights and sort by that
         for (var key in constituents) {
             var constituent = constituents[key];
@@ -229,8 +234,6 @@ class IndexConstituent {
 
     calculateEquityReturns(){
         var equityData = this.EquityData[this.date]
-        console.log("** p0 "+equityData.length+" "+JSON.stringify(equityData[0]["Price"]))
-        console.log("** p0 "+equityData.length+" "+JSON.stringify(equityData[equityData.length - 1]))
         var priceZero = equityData[equityData.length - 1]["Price"];
         
         for (var i = 0; i < equityData.length; i++) {
@@ -241,8 +244,6 @@ class IndexConstituent {
 
     calculateIndexEquityReturns(){
         var indexEquityData = this.IndexEquityData[this.date]
-        console.log("** p00 "+indexEquityData.length+" "+JSON.stringify(indexEquityData[0]["Price"]))
-        console.log("** p00 "+indexEquityData.length+" "+JSON.stringify(indexEquityData[indexEquityData.length - 1]))
         var priceZero = indexEquityData[indexEquityData.length - 1]["Price"];
         for (var i = 0; i < indexEquityData.length; i++) {
             var returns  = ((indexEquityData[i]["Price"] - priceZero)*100/priceZero).toFixed(2);

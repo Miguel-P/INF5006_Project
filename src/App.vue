@@ -42,12 +42,12 @@
           {
             href: '/',
             title: 'Dashboard',
-            icon: 'fa fa-table'
+            icon: 'fa fa-chart-area'
           },
           {
-            href: '/piecharts',
-            title: 'Pie Charts',
-            icon: 'fa fa-chart-pie'
+            href: '/betatables',
+            title: 'Beta Tables',
+            icon: 'fa fa-table'
           },
           {
             href: '/linecharts',
@@ -90,5 +90,45 @@
     justify-content: center;
     display: inline-block;
     margin-top: 20%;
+  }
+
+  .green{
+    color: white;
+    background: green;
+  }
+
+  .red{
+    color: white;
+    background: red;
+  }
+
+  .orange{
+    color: white;
+    background: orange;
+  }
+
+  .w100 {
+      width: 100%;
+  }
+
+  .w60 {
+      width: 60%;
+  }
+
+  .w40 {
+      width: 40%;
+  }
+
+  .w20 {
+      width: 20%;
+  }
+
+  .horizontal div {
+      display: inline-block;
+      margin: 2px;
+  }
+
+  .horizontal-no-margin div {
+      display: inline-block;
   }
 </style>

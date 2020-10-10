@@ -9,4 +9,6 @@ router.get('/index_constituents/:constituentCode/index/:indexCode/date/:date/per
 
 router.get('/index_constituents/betas/:date',controller.get_constituent_beta_data)
 
+router.get('/index_constituents/betas',controller.get_constituent_beta_data)
+
 export default router;

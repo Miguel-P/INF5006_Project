@@ -407,30 +407,3 @@
         }
     }
 </script>
-
-<style>
-    .w100 {
-        width: 100%;
-    }
-
-    .w60 {
-        width: 60%;
-    }
-
-    .w40 {
-        width: 40%;
-    }
-
-    .w20 {
-        width: 20%;
-    }
-
-    .horizontal div {
-        display: inline-block;
-        margin: 2px;
-    }
-
-    .horizontal-no-margin div {
-        display: inline-block;
-    }
-</style>

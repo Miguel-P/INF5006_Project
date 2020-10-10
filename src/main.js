@@ -9,6 +9,7 @@ import ZingGrid from 'zinggrid'
 import VueRouter from 'vue-router'
 
 import Dashboard from './views/finance/Dashboard.vue'
+import BetaTables from './views/finance/BetaTables.vue'
 
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import 'vue-search-select/dist/VueSearchSelect.css'
@@ -31,6 +32,11 @@ const router = new VueRouter({
       path: '/',
       name: 'Dashboard',
       component: Dashboard
+    },
+    {
+      path: '/betatables',
+      name: 'BetaTables',
+      component: BetaTables
     }
   ]
 })
