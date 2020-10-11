@@ -17,6 +17,7 @@ import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import 'vue-search-select/dist/VueSearchSelect.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import './assets/js/zingchart-navpie.min.js';
 
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 

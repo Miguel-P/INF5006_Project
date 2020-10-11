@@ -58,7 +58,7 @@
 </template>
 
 <script>
-    import axios from 'axios';
+    import axios from 'axios'
     import { ModelSelect } from 'vue-search-select'
     import {Circle9} from 'vue-loading-spinner'
 
@@ -119,10 +119,7 @@
                         fontFamily: 'Lato',
                         fontSize: '20px'
                     },
-                    series: [
-                        //{ values: equitySeries, text: key+' Returns'},
-                        //{ values: indexSeries, text:  indexCode+' Returns'}
-                    ]
+                    series: []
                 }
 
                 return plotData
@@ -260,39 +257,54 @@
                 let weightSeries = []
                 let totalWeight = 0
                 // Show top 10 index contributors and the rest group them up
-                for (var i=0; i < Math.min(constituentValues.length,20); i++) {
+                for (var i=0; i < constituentValues.length; i++){
+                    //Math.min(constituentValues.length,20); i++) {
                     var constituent = constituentValues[i]
                     var weight = parseFloat(constituent["weight"])
                     totalWeight += weight
                     weightSeries.push({ values: [weight], text: constituent["alpha"]}) 
                 }
-                weightSeries.push({ values: [100 - totalWeight], text: "Other" })
+                //weightSeries.push({ values: [100 - totalWeight], text: "Other" })
                 
-                this.capChartData = {
-                    type: 'pie',
-                    scaleX: {
-                        zooming: true //sets zooming along scaleX
-                    },
-                    scaleY: {
-                        zooming: true //sets zooming along scaleY
-                    },
-                    plot: {
-                        borderColor: "#2B313B",
-                        borderWidth: 2,
-                        valueBox: {
-                            placement: 'out',
-                            text: '%t\n%npv%',
-                            fontFamily: "Open Sans"
-                        }
-                    },
-                    title: {
-                        text: "Index Capitalisation",
-                        padding: '15px',
-                        fontColor: '#1E5D9E',
-                        fontFamily: 'Lato',
-                        fontSize: '20px'
-                    },
-                    series: weightSeries
+                this.capChartData = { 
+                    graphset: [{
+                        type: 'navpie',
+                        others: {
+                            backgroundColor: "#8b0000"
+                        },
+                        options: {
+                            threshold: "1%",
+                            slice: 0.65,
+                            back: {
+                                padding: 10,
+                                fontWeight: "bold",
+                                color: "#fff",
+                                fontSize: 12,
+                                border: "3px solid #47a",
+                                borderRadius: 9,
+                                backgroundColor: "#369",
+                                shadow: true,
+                                shadowAlpha: 0.5
+                            }
+                        },
+                        plot: {
+                            borderColor: "#2B313B",
+                            borderWidth: 2,
+                            valueBox: {
+                                placement: 'out',
+                                text: '%t\n%npv%',
+                                fontFamily: "Open Sans"
+                            }
+                        },
+                        title: {
+                            text: "Index Capitalisation",
+                            padding: '15px',
+                            fontColor: '#1E5D9E',
+                            fontFamily: 'Lato',
+                            fontSize: '20px'
+                        },
+                        series: weightSeries
+                    }]
                 }
             }, 
             filter: function(){

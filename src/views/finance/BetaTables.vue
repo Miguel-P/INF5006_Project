@@ -57,9 +57,7 @@
             }
         },
         methods: {
-            prepareData() {
-                var data = this.results
-
+            registerGridMethods(){
                 var betaCellFunction = function(openValue, cellDOMRef, cellRef){
                     var beta = parseFloat(openValue)
                     if (beta > 1){
@@ -76,6 +74,9 @@
                 // set up zinggrid
                 this.zinggrid = document.querySelector('zing-grid')
                 ZingGrid.registerMethod(betaCellFunction, 'betaCellFunction', this)
+            },
+            prepareData() {
+                var data = this.results
 
                 var betaPeriods = data["dates"]
                 var dates = []
@@ -127,6 +128,8 @@
             }
         },
         created () {
+            this.registerGridMethods()
+
             this.loading = true
             axios.get('http://localhost:3000/api/index_constituents/betas')
             .then(response => {
