@@ -43,6 +43,10 @@
                     <div class="w20">
                         <input type="button" value="Filter"  @click="filter()" class="btn btn-info w60"/>
                     </div>
+
+                    <div class="w20">
+                        <input type="button" value="Reset"  @click="plotConstituentData(true)" class="btn btn-info w60"/>
+                    </div>
                 </div>
 
                 <div class="w100">
@@ -129,7 +133,7 @@
                     console.log(data)
                 }
             },
-            plotConstituentData(){
+            plotConstituentData(reset){
                 var data = this.results
                 let indexCode = data["code"]
 
@@ -179,7 +183,7 @@
                 var series = this.equityChartData["series"]
 
                 // First time being plotted
-                if (!series){
+                if (!series || reset){
                     series = []
                 }
 
@@ -208,7 +212,7 @@
                 for (var key in constituents) {
                     if (!firstKey) firstKey = key
                     var constituent = constituents[key]
-                    constituentCodes.push({ value: constituent["alpha"], text: constituent["alpha"] })
+                    constituentCodes.push({ value: constituent["alpha"], text: constituent["Instrument"] })
                 }
                 this.constituentCodes=constituentCodes;
 
@@ -342,7 +346,7 @@
                     //console.log("got index data")
                     this.results = response.data.results
                     this.prepareIndexData()
-                    this.plotConstituentData()
+                    this.plotConstituentData(true)
                     this.plotIndexData()
                     this.loading = false
                 })
@@ -363,7 +367,7 @@
                 )
                 .then(response => {
                     this.prepareConstituentData(response.data.results)
-                    this.plotConstituentData()
+                    this.plotConstituentData(false)
                     this.loading = false
                 })
                 .catch(e => {
@@ -378,7 +382,7 @@
             .then(response => {
                 this.results = response.data.results
                 this.prepareIndexData()
-                this.plotConstituentData()
+                this.plotConstituentData(true)
                 this.plotIndexData()
                 this.registerChartEvents()
                 this.loading = false

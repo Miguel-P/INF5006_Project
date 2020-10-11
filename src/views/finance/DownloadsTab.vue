@@ -51,6 +51,8 @@
                     </div>
                 <zing-grid 
                     caption="Downloads"
+                    draggable="columns" 
+                    drag-action="hide"  
                     :data.prop="gridData" 
                     filter 
                     sort 

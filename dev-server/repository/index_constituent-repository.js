@@ -116,6 +116,7 @@ class IndexConstituent {
             totalCap = totalCap + constituentModel.Gross_Market_Capitalisation;
 
             var constituent = new IndexConstituent(constituentModel["Date"],constituentModel["Alpha"]);
+            constituent.Instrument = constituentModel["Instrument"]
             constituent.grossMarketCapitalisation = constituentModel.Gross_Market_Capitalisation;
             constituents[constituentModel["Alpha"]] = constituent;
         }

@@ -8,6 +8,13 @@
         <div class="horizontal-no-margin">
             <div class="horizontal w100">
                 <div class="w20">
+                    <model-select
+                        :options="tables"
+                        v-model="table"
+                        placeholder="Select Table">
+                    </model-select>
+                </div>
+                <div class="w20">
                     <model-select 
                         :options="dates"
                         v-model="date"
@@ -152,7 +159,12 @@
                 subSectors: '',
                 sharesBetaData: {},
                 dates: [],
-                date: ''
+                date: '',
+                tables: [
+                    {value: 'sharetable', text: 'Share Table'},
+                    {value: 'indextable', text: 'Index Table'}
+                ],
+                table: 'sharetable'
             }
         },
         components: {
