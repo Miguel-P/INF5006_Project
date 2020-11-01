@@ -46,7 +46,14 @@
                                 <input type="button" value="Download Table"  @click="downloadTable()" class="btn btn-info w60"/>
                         </div>
                     </div>
-                <zing-grid :data.prop="gridData" filter sort pager></zing-grid>
+                    <b-form-group label="Add/Remove Columns:" v-show='loaded'>
+                        <b-form-checkbox-group
+                          id="checkbox-group-1"
+                          v-model="selected_columns"
+                          :options="possible_columns"
+                        ></b-form-checkbox-group>
+                    </b-form-group>
+                <zing-grid id="downloads_table" :data.prop="gridData" filter sort pager></zing-grid>
              </div>
         </div>
     </div>
@@ -67,10 +74,14 @@
         methods: {
             downloadTable: function() {
                 console.log("Downloading table")
-                var csv = this.arrayToCSV(this.gridData)
-                console.log("csv cotents: ", csv)
+                const data = downloads_table.getData({
+                                csv: true,
+                                headers: true,
+                                cols: "visible",
+                                rows: "visible" 
+                              });                
                 var hiddenElement = document.createElement('a');
-                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(data);
                 hiddenElement.target = '_blank';
                 hiddenElement.download = this.table+"_"+this.date+"_period"+this.period+'.csv';
                 hiddenElement.click();
@@ -96,45 +107,21 @@
                     )
                 .then(response => {
                     this.gridData = null
-                    console.log("Table data = ", response.data.message)
+                    this.loaded = false
+                    this.possible_columns = []
+                    this.selected_columns = []
+                    console.log("Table data = ", response.data.message[0])
                     this.gridData = response.data.message
-                })
-                .catch(e => {
-                    this.errors.push(e)
-                })
-            },
-            getIndexData(){
-                console.log("getting index data "+this.indexCode+" "+this.date)
-                axios.get(
-                        'http://localhost:3000/api'+
-                        '/indexes/'+this.indexCode+
-                        '/date/'+this.date+
-                        '/period/'+this.period
-                )
-                .then(response => {
-                    console.log("got index data")
-                    this.results = response.data.results
-                    this.prepareIndexData()
-                    this.plotReturns()
-                    this.plotCapData()
-                })
-                .catch(e => {
-                    console.log(e)
-                })
-            },
-            getConstituentData(){
-                console.log("getting constituent data")
-                axios.get(
-                        'http://localhost:3000/api'+
-                        '/index_constituents/'+this.constituentCode+
-                        '/index/'+this.indexCode+
-                        '/date/'+this.date+
-                        '/period/'+this.period
-                )
-                .then(response => {
-                    console.log("got constituent data")
-                    this.prepareConstituentData(response.data.results)
-                    this.plotReturns()
+                    // fetch the column names from the returned data:
+                    for (var item in response.data.message[0]){
+                        this.possible_columns.push(item)
+                    }
+                    this.selected_columns = this.possible_columns
+                    // now display the check box item
+                    this.loaded = true
+                    // This should work, but doesn't. In any case, it's not that intuitive.
+                    // downloads_table.setDraggable('columns');
+                    // downloads_table.setDragAction('remove');
                 })
                 .catch(e => {
                     console.log(e)
@@ -153,11 +140,6 @@
                     var date = dateArray[i].Date.substring(0,10)
                     this.dates.push({ value: date, text: date })
                 }
-                // dates.push({ value: period["Date"], text: period["Date"] })
-                // for(var i in response["message"]) {
-                //     console.log(i.Date)
-                //     this.dates.push(i.Date)
-                // }
             })
             .catch(e => {
                 console.log(e)
@@ -167,6 +149,7 @@
             return {
                 gridData: {},
                 results: {},
+                loaded: false,
                 tables: [
                     {value: 'sharetable', text: 'Share Table'},
                     {value: 'indextable', text: 'Index Table'}
@@ -189,7 +172,20 @@
                     {value: '60', text: '5 years'},
                     {value: '120', text: '10 years'},
                 ],
-                period: ''
+                period: '',
+                selected_columns: [],
+                possible_columns: []
+            }
+        },
+        watch: {
+            selected_columns: function () {
+                var diff = this.possible_columns.filter(x => !this.selected_columns.includes(x) );
+                for (var i = 0; i < diff.length; i++) {
+                    downloads_table.hideColumn(diff[i])
+                }
+                for (var i = 0; i < this.selected_columns.length; i++) {
+                    downloads_table.showColumn(this.selected_columns[i])
+                }
             }
         }
     }
