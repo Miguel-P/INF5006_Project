@@ -1,7 +1,10 @@
 <template>
     <div id="app">
-        <Navbar/>
-        <Sidebar/>
+        <div class="loader" v-if="loading">
+            <div>
+                <circle9></circle9>
+            </div>
+        </div>
         <div id="app-container">
             <div class="horizontal-no-margin">
                     <div class="horizontal w100">
@@ -46,7 +49,15 @@
                                 <input type="button" value="Download Table"  @click="downloadTable()" class="btn btn-info w60"/>
                         </div>
                     </div>
-                <zing-grid :data.prop="gridData" filter sort pager></zing-grid>
+                <zing-grid 
+                    caption="Downloads"
+                    draggable="columns" 
+                    drag-action="hide"  
+                    :data.prop="gridData" 
+                    filter 
+                    sort 
+                    pager>
+                </zing-grid>
              </div>
         </div>
     </div>
@@ -57,12 +68,14 @@
     import { ModelSelect } from 'vue-search-select'
     import Navbar from '@/components/Navbar'
     import Sidebar from '@/components/Sidebar'
+    import {Circle9} from 'vue-loading-spinner'
 
     export default {
         components: {
             ModelSelect,
             Navbar,
-            Sidebar
+            Sidebar,
+            Circle9
         },
         methods: {
             downloadTable: function() {
@@ -87,6 +100,7 @@
             },
             
             createTable: function(){
+                this.loading = true
                 axios.get(
                             'http://localhost:3000/api/downloads/'+
                             this.table+'/'+
@@ -95,16 +109,19 @@
                             '/period/'+this.period
                     )
                 .then(response => {
+                    this.loading = false
                     this.gridData = null
                     console.log("Table data = ", response.data.message)
                     this.gridData = response.data.message
                 })
                 .catch(e => {
+                    this.loading = false
                     this.errors.push(e)
                 })
             },
             getIndexData(){
                 console.log("getting index data "+this.indexCode+" "+this.date)
+                this.loading = true
                 axios.get(
                         'http://localhost:3000/api'+
                         '/indexes/'+this.indexCode+
@@ -112,6 +129,7 @@
                         '/period/'+this.period
                 )
                 .then(response => {
+                    this.loading = false
                     console.log("got index data")
                     this.results = response.data.results
                     this.prepareIndexData()
@@ -119,6 +137,7 @@
                     this.plotCapData()
                 })
                 .catch(e => {
+                    this.loading = false
                     console.log(e)
                 })
             },
@@ -165,6 +184,7 @@
         },
         data() {
             return {
+                loading: false,
                 gridData: {},
                 results: {},
                 tables: [

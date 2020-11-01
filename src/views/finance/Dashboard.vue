@@ -1,71 +1,76 @@
 <template>
     <div id="app">
-        <Navbar/>
-        <Sidebar/>
-        <div id="app-container">
-            <div class="horizontal-no-margin">
-                <div class="w60">
-                    <div class="horizontal w100">
-                        <div class="w20">
-                            <model-select
-                                :options="indexCodes"
-                                v-model="indexCode"
-                                placeholder="Select Index">
-                            </model-select>
-                        </div>
-
-                        <div class="w20">  
-                            <model-select 
-                                :options="constituentCodes"
-                                v-model="constituentCode"
-                                placeholder="Select Instrument">
-                            </model-select>
-                        </div>
-
-                        <div class="w20">
-                            <model-select 
-                                :options="dates"
-                                v-model="date"
-                                placeholder="Select Date">
-                            </model-select>
-                        </div>
-
-                        <div class="w20">
-                            <model-select 
-                                :options="periods"
-                                v-model="period"
-                                placeholder="Select Period">
-                            </model-select>
-                        </div>
-
-                        <div class="w20">
-                            <input type="button" value="Filter"  @click="filter()" class="btn btn-info w60"/>
-                        </div>
+        <div class="loader" v-if="loading">
+            <div>
+                <circle9></circle9>
+            </div>
+        </div>
+        <div class="horizontal-no-margin">
+            <div class="w60">
+                <div class="horizontal w100">
+                    <div class="w20">
+                        <model-select
+                            :options="indexCodes"
+                            v-model="indexCode"
+                            placeholder="Select Index">
+                        </model-select>
                     </div>
 
-                    <div class="w100">
-                        <zingchart :data="equityChartData"></zingchart>
+                    <div class="w20">
+                        <model-select 
+                            :options="constituentCodes"
+                            v-model="constituentCode"
+                            placeholder="Select Instrument">
+                        </model-select>
+                    </div>
+
+                    <div class="w20">
+                        <model-select 
+                            :options="dates"
+                            v-model="date"
+                            placeholder="Select Date">
+                        </model-select>
+                    </div>
+
+                    <div class="w20">
+                        <model-select 
+                            :options="periods"
+                            v-model="period"
+                            placeholder="Select Period">
+                        </model-select>
+                    </div>
+
+                    <div class="w20">
+                        <input type="button" value="Filter"  @click="filter()" class="btn btn-info w60"/>
+                    </div>
+
+                    <div class="w20">
+                        <input type="button" value="Reset"  @click="plotConstituentData(true)" class="btn btn-info w60"/>
                     </div>
                 </div>
-                <div class="w40">
-                    <zingchart :data="capChartData"></zingchart>
+
+                <div class="w100">
+                    <zingchart :id="equityChartId" :data="equityChartData"></zingchart>
                 </div>
-             </div>
+            </div>
+
+            <div class="w40">
+                <zingchart :id="capChartId" :data="capChartData"></zingchart>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
+    import axios from 'axios'
     import { ModelSelect } from 'vue-search-select'
-    import Navbar from '@/components/Navbar'
-    import Sidebar from '@/components/Sidebar'
+    import {Circle9} from 'vue-loading-spinner'
 
     export default {
-        components: {
-            ModelSelect,
-            Navbar,
-            Sidebar
+        props: {
+            data: {
+                type: Object
+            }
         },
         methods: {
             prepareConstituentData(constituentData){
@@ -118,10 +123,7 @@
                         fontFamily: 'Lato',
                         fontSize: '20px'
                     },
-                    series: [
-                        //{ values: equitySeries, text: key+' Returns'},
-                        //{ values: indexSeries, text:  indexCode+' Returns'}
-                    ]
+                    series: []
                 }
 
                 return plotData
@@ -131,7 +133,7 @@
                     console.log(data)
                 }
             },
-            plotConstituentData(){
+            plotConstituentData(reset){
                 var data = this.results
                 let indexCode = data["code"]
 
@@ -181,7 +183,7 @@
                 var series = this.equityChartData["series"]
 
                 // First time being plotted
-                if (!series){
+                if (!series || reset){
                     series = []
                 }
 
@@ -210,7 +212,7 @@
                 for (var key in constituents) {
                     if (!firstKey) firstKey = key
                     var constituent = constituents[key]
-                    constituentCodes.push({ value: constituent["alpha"], text: constituent["alpha"] })
+                    constituentCodes.push({ value: constituent["alpha"], text: constituent["Instrument"] })
                 }
                 this.constituentCodes=constituentCodes;
 
@@ -259,39 +261,54 @@
                 let weightSeries = []
                 let totalWeight = 0
                 // Show top 10 index contributors and the rest group them up
-                for (var i=0; i < Math.min(constituentValues.length,20); i++) {
+                for (var i=0; i < constituentValues.length; i++){
+                    //Math.min(constituentValues.length,20); i++) {
                     var constituent = constituentValues[i]
                     var weight = parseFloat(constituent["weight"])
                     totalWeight += weight
                     weightSeries.push({ values: [weight], text: constituent["alpha"]}) 
                 }
-                weightSeries.push({ values: [100 - totalWeight], text: "Other" })
+                //weightSeries.push({ values: [100 - totalWeight], text: "Other" })
                 
-                this.capChartData = {
-                    type: 'pie',
-                    scaleX: {
-                        zooming: true //sets zooming along scaleX
-                    },
-                    scaleY: {
-                        zooming: true //sets zooming along scaleY
-                    },
-                    plot: {
-                        borderColor: "#2B313B",
-                        borderWidth: 2,
-                        valueBox: {
-                            placement: 'out',
-                            text: '%t\n%npv%',
-                            fontFamily: "Open Sans"
-                        }
-                    },
-                    title: {
-                        text: "Index Capitalisation",
-                        padding: '15px',
-                        fontColor: '#1E5D9E',
-                        fontFamily: 'Lato',
-                        fontSize: '20px'
-                    },
-                    series: weightSeries
+                this.capChartData = { 
+                    graphset: [{
+                        type: 'navpie',
+                        others: {
+                            backgroundColor: "#8b0000"
+                        },
+                        options: {
+                            threshold: "1%",
+                            slice: 0.65,
+                            back: {
+                                padding: 10,
+                                fontWeight: "bold",
+                                color: "#fff",
+                                fontSize: 12,
+                                border: "3px solid #47a",
+                                borderRadius: 9,
+                                backgroundColor: "#369",
+                                shadow: true,
+                                shadowAlpha: 0.5
+                            }
+                        },
+                        plot: {
+                            borderColor: "#2B313B",
+                            borderWidth: 2,
+                            valueBox: {
+                                placement: 'out',
+                                text: '%t\n%npv%',
+                                fontFamily: "Open Sans"
+                            }
+                        },
+                        title: {
+                            text: "Index Capitalisation",
+                            padding: '15px',
+                            fontColor: '#1E5D9E',
+                            fontFamily: 'Lato',
+                            fontSize: '20px'
+                        },
+                        series: weightSeries
+                    }]
                 }
             }, 
             filter: function(){
@@ -329,7 +346,7 @@
                     //console.log("got index data")
                     this.results = response.data.results
                     this.prepareIndexData()
-                    this.plotConstituentData()
+                    this.plotConstituentData(true)
                     this.plotIndexData()
                     this.loading = false
                 })
@@ -350,7 +367,7 @@
                 )
                 .then(response => {
                     this.prepareConstituentData(response.data.results)
-                    this.plotConstituentData()
+                    this.plotConstituentData(false)
                     this.loading = false
                 })
                 .catch(e => {
@@ -365,7 +382,7 @@
             .then(response => {
                 this.results = response.data.results
                 this.prepareIndexData()
-                this.plotConstituentData()
+                this.plotConstituentData(true)
                 this.plotIndexData()
                 this.registerChartEvents()
                 this.loading = false
@@ -399,33 +416,10 @@
                 date: '',
                 period: ''
             }
+        },
+        components: {
+            ModelSelect,
+            Circle9
         }
     }
 </script>
-
-<style>
-    .w100 {
-        width: 100%;
-    }
-
-    .w60 {
-        width: 60%;
-    }
-
-    .w40 {
-        width: 40%;
-    }
-
-    .w20 {
-        width: 20%;
-    }
-
-    .horizontal div {
-        display: inline-block;
-        margin: 2px;
-    }
-
-    .horizontal-no-margin div {
-        display: inline-block;
-    }
-</style>
