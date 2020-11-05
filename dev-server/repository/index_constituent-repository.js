@@ -135,9 +135,8 @@ class IndexConstituent {
 
     static async getConstituentData(indexCode, constituent, period){
         await constituent.getBetaData(indexCode)
-        .then(function(beta) {
-            //console.log("**** beta 1 ");
-            constituent.Beta = beta;
+        .then(function(betaModels) {
+            constituent.Beta = betaModels
         })
         .catch(function (err) {
             console.log("*** error getting beta: "+err);
@@ -200,13 +199,12 @@ class IndexConstituent {
     }
 
     async getBetaData(indexCode) {
-        //var transaction = await sequelize.transaction();
-        return await BetaModel.findOne({
+        return await BetaModel.findAll({
             where: sequelize.literal(
                 " MONTH([Date]) = MONTH('"+this.date+"') AND"+
                 " YEAR([Date]) = YEAR('"+this.date+"') AND"+
-                " Instrument = '"+this.alpha+"' AND"+
-                " [Index] = '"+indexCode+"'"
+                " Instrument = '"+this.alpha+"'"
+                //" [Index] = '"+indexCode+"'"
             )
         });
     }
