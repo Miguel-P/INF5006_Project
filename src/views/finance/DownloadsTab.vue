@@ -101,51 +101,155 @@
                     return str;
                     }, str);
             },
-            
-            createTable: function(){
-                this.loading = true
-                axios.get(
+            makeColumnSelectors: function(response) {
+                console.log("Making column selectors...")
+                this.possible_columns = []
+                this.selected_columns = []
+                // fetch the column names from the returned data:
+                for (var item in response.data.message[0]){
+                    this.possible_columns.push(item)
+                }
+                this.selected_columns = this.possible_columns
+                // now display the check box item
+                this.loaded = true
+            },
+            getSharesMetrics: async function() {
+                if (this.share_code == "View All") {
+                    var share_code = ""
+                }
+                else {
+                    var share_code = "share_code/" + this.share_code + "/"
+                }
+                let response = await axios.get(
+                            'http://localhost:3000/api/downloads/'+
+                            this.table+ '/' +
+                            this.index_code+ "/" +
+                            this.marketProxy + "/" +
+                            share_code +
+                            'date/'+this.date+
+                            '/period/'+this.period
+                )
+                return await response
+            },
+            getPortfMetrics: async function() {
+                let response = await axios.get(
+                            'http://localhost:3000/api/downloads/'+
+                            this.table+ '/' +
+                            this.marketProxy + "/" +
+                            'date/'+this.date+
+                            '/period/'+this.period
+                )
+                return await response
+            },
+            getIndusPortfMetrics: async function() {
+                let response = await axios.get(
+                            'http://localhost:3000/api/downloads/'+
+                            this.table+ '/' +
+                            'index/' + this.index_code+ "/" +
+                            'mkt_index/' + this.marketProxy + "/" +
+                            'date/' + this.date+
+                            '/period/'+this.period
+                )
+                return await response
+            },
+            getStandardTables: async function() {
+                let response = await axios.get(
                             'http://localhost:3000/api/downloads/'+
                             this.table+'/'+
                             this.marketProxy+
                             '/date/'+this.date+
                             '/period/'+this.period
-                    )
-                .then(response => {
-                    this.loading = false
-                    this.gridData = null
-                    this.loaded = false
-                    this.possible_columns = []
-                    this.selected_columns = []
-                    console.log("Table data = ", response.data.message[0])
-                    this.gridData = response.data.message
-                    // fetch the column names from the returned data:
-                    for (var item in response.data.message[0]){
-                        this.possible_columns.push(item)
-                    }
-                    this.selected_columns = this.possible_columns
-                    // now display the check box item
-                    this.loaded = true
-                    // This should work, but doesn't. In any case, it's not that intuitive.
-                    // downloads_table.setDraggable('columns');
-                    // downloads_table.setDragAction('remove');
-                })
-                .catch(e => {
-                    console.log(e)
-                })
+                )
+                return await response
+            },
+            createTable: function(){
+                this.loading = true
+                this.loaded = false
+                if (this.table == "sharetable" | this.table == "indextable"){
+                    this.getStandardTables()
+                    .then(response => {
+                        this.loading = false
+                        console.log("Table data = ", response.data.message[0])
+                        this.gridData = response.data.message
+                        this.makeColumnSelectors(response)
+                    })
+                    .catch(e => {
+                        console.log(e)
+                    })
+                }
+                else if (this.table == "sharesMetrics"){
+                    this.getSharesMetrics()
+                    .then(response => {
+                        this.loading = false
+                        console.log("Table data = ", response.data.message[0])
+                        this.gridData = response.data.message
+                        this.makeColumnSelectors(response)
+                    })
+                    .catch(e => {
+                        console.log(e)
+                    })
+                }
+                else if (this.table == "portfMetrics"){
+                    this.getPortfMetrics()
+                    .then(response => {
+                        this.loading = false
+                        console.log("Table data = ", response.data.message[0])
+                        this.gridData = response.data.message
+                        this.makeColumnSelectors(response)
+                    })
+                }
+                else {
+                    this.getIndusPortfMetrics()
+                    .then(response => {
+                        this.loading = false
+                        console.log("Table data = ", response.data.message[0])
+                        this.gridData = response.data.message
+                        this.makeColumnSelectors(response)
+                    })
+                }
             }
         },
         created () {
+            // get info for drop down selectors
+            // get dates
             axios.get('http://localhost:3000/api/downloads/dates')
             .then(response => {
                 console.log("Fetching dates")
-                console.log("response", response)
+                // console.log("response", response)
                 // since the message is packed with stringify, the output/json obj is an array!
                 var dateArray = response.data["message"]
                 // this.dates = Object.values(dateArray)
                 for (var i=0; i <dateArray.length; i++) {
                     var date = dateArray[i].Date.substring(0,10)
                     this.dates.push({ value: date, text: date })
+                }
+            })
+            .catch(e => {
+                console.log(e)
+            })
+            // get the share codes
+            axios.get('http://localhost:3000/api/downloads/share_codes')
+            .then(response => {
+                console.log("Fetching share codes")
+                // console.log("response", response)
+                var shareCodesArray = response.data["message"]
+                for (var i=0; i <shareCodesArray.length; i++) {
+                    var share_code = shareCodesArray[i]
+                    this.share_codes.push({ value: share_code, text: share_code })
+                }
+            })
+            .catch(e => {
+                console.log(e)
+            })
+            // get the index codes
+            axios.get('http://localhost:3000/api/downloads/index_codes')
+            .then(response => {
+                console.log("Fetching share codes")
+                // console.log("response", response)
+                var indexCodesArray = response.data["message"]
+                for (var i=0; i <indexCodesArray.length; i++) {
+                    var index_code = indexCodesArray[i]
+                    this.index_codes.push({ value: index_code, text: index_code })
                 }
             })
             .catch(e => {
@@ -160,7 +264,10 @@
                 loaded: false,
                 tables: [
                     {value: 'sharetable', text: 'Share Table'},
-                    {value: 'indextable', text: 'Index Table'}
+                    {value: 'indextable', text: 'Index Table'},
+                    {value: 'indusPortfMetrics', text: 'Industry Portfolio Table'},
+                    {value: 'sharesMetrics', text: 'Share Metrics Table'},
+                    {value: 'portfMetrics', text: 'Portfolio Metrics Table'}
                 ],
                 table: '',
                 marketProxies: [
@@ -181,6 +288,10 @@
                     {value: '120', text: '10 years'},
                 ],
                 period: '',
+                share_codes: ['View All'],
+                share_code: 'View All',
+                index_codes: [],
+                index_code: 'ALSI',
                 selected_columns: [],
                 possible_columns: []
             }
@@ -193,6 +304,12 @@
                 }
                 for (var i = 0; i < this.selected_columns.length; i++) {
                     downloads_table.showColumn(this.selected_columns[i])
+                }
+            },
+            table: function () {
+                if (this.table == "shareMetrics_table") {
+                    // change the dropdown selectors
+                    // should give options for: index, mkt_index, share_code (with the option to leave share code blank)
                 }
             }
         }
