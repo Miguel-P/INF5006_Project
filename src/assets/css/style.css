@@ -9,7 +9,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-  }
+    margin-left: 30px;
+}
 
 div#app-container {
     margin: 1.5em;
@@ -46,7 +47,6 @@ div#custom-home {
 
 .w100 {
     width: 100%;
-    margin: 1em;
 }
 
 .w60 {
@@ -64,6 +64,23 @@ div#custom-home {
 .w30 {
     width: 30%;
     padding: 5px;
+}
+
+.h100 {
+    height: 100%;
+    margin-top: 0px;
+}
+
+.margined {
+    margin: 1em;
+}
+
+.margined-s{
+    margin: 0.5em;
+}
+
+.top{
+    vertical-align:top;
 }
 
 .horizontal div {
@@ -86,4 +103,57 @@ div#custom-home {
     height: 100px;
     margin-bottom: 2%; /* (100-32*3)/2 */
 }
+
+.loader {  /* Loader Div Class */
+    justify-content: center;
+    position: absolute;
+    top:0px;
+    right:0px;
+    width:100%;
+    height:100%;
+    background-color:#300;
+    background-size: 50px;
+    background-repeat:no-repeat;
+    background-position:center;
+    z-index:10000000;
+    opacity: 0.8;
+    filter: alpha(opacity=40);
+}
+
+.loader div {
+    justify-content: center;
+    display: inline-block;
+    margin-top: 20%;
+}
+
+.border{
+    border: #300;
+    border-radius: 2px;
+    border-width: 2px;
+}
+
+.green{
+    color: white;
+    background: green;
+}
+
+.red{
+    color: white;
+    background: red;
+}
+
+.orange{
+    color: white;
+    background: orange;
+}
+
+.text{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 99%;
+}
   
+zing-grid {
+    --zg-cell-height: 50px;
+  }

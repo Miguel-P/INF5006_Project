@@ -1,73 +1,137 @@
 <template>
     <div id="app">
-        <Navbar/>
-        <Sidebar/>
-        <div id="app-container">
-            <div class="horizontal-no-margin">
-                <div class="w60">
-                    <div class="horizontal w100">
-                        <div class="w20">
-                            <model-select
-                                :options="indexCodes"
-                                v-model="indexCode"
-                                placeholder="Select Index">
-                            </model-select>
-                        </div>
-
-                        <div class="w20">  
-                            <model-select 
-                                :options="constituentCodes"
-                                v-model="constituentCode"
-                                placeholder="Select Instrument">
-                            </model-select>
-                        </div>
-
-                        <div class="w20">
-                            <model-select 
-                                :options="dates"
-                                v-model="date"
-                                placeholder="Select Date">
-                            </model-select>
-                        </div>
-
-                        <div class="w20">
-                            <model-select 
-                                :options="periods"
-                                v-model="period"
-                                placeholder="Select Period">
-                            </model-select>
-                        </div>
-
-                        <div class="w20">
-                            <input type="button" value="Filter"  @click="filter()" class="btn btn-info w60"/>
-                        </div>
+        <div class="loader" v-if="loading">
+            <div>
+                <circle9></circle9>
+            </div>
+        </div>
+        
+        <div class="horizontal-no-margin">
+            <div class="w60">
+                <div class="horizontal w100">
+                    <div class="w20">
+                        <model-select
+                            id="selectIndex"
+                            :options="indexCodes"
+                            v-model="indexCode"
+                            placeholder="Select Index">
+                        </model-select>
+                        <b-tooltip 
+                            target="selectIndex" 
+                            placement="left"
+                            title="select index to analyze">
+                        </b-tooltip>
                     </div>
 
-                    <div class="w100">
-                        <zingchart :data="equityChartData"></zingchart>
+                    <div class="w20">
+                        <model-select 
+                            id="selectConstituent"
+                            :options="constituentCodes"
+                            v-model="constituentCode"
+                            placeholder="Select Instrument">
+                        </model-select>
+                        <b-tooltip 
+                            target="selectConstituent" 
+                            placement="left"
+                            title="select index constituent to analyze">
+                        </b-tooltip>
+                    </div>
+
+                    <div class="w20">
+                        <model-select 
+                            id="selectDate"
+                            :options="dates"
+                            v-model="date"
+                            placeholder="Select Date">
+                        </model-select>
+                        <b-tooltip 
+                            target="selectDate" 
+                            placement="left"
+                            title="select beta calculation date">
+                        </b-tooltip>
+                    </div>
+
+                    <div class="w20">
+                        <model-select 
+                            id="selectPeriod"
+                            :options="periods"
+                            v-model="period"
+                            placeholder="Select Period">
+                        </model-select>
+                        <b-tooltip 
+                            target="selectPeriod" 
+                            placement="left"
+                            title="select length of period for returns">
+                        </b-tooltip>
+                    </div>
+
+                    <div class="w20">
+                        <input type="button" value="Filter"  @click="filter()" class="btn btn-info w60"/>
+                    </div>
+
+                    <div class="w20">
+                        <input type="button" value="Reset"  @click="plotConstituentData(true)" class="btn btn-info w60"/>
                     </div>
                 </div>
-                <div class="w40">
-                    <zingchart :data="capChartData"></zingchart>
+
+                <div class="w100">
+                    <zingchart :id="equityChartId" :data="equityChartData"></zingchart>
                 </div>
-             </div>
+            </div>
+
+            <div class="w40 h100 top">
+                <div class="horizontal w100 margined-s">
+                    <input type="button" :value="showBetasText"  @click="showBetaTable()" class="btn btn-info w60"/>
+                </div>
+                <transition name="fade">
+                    <div v-if="showBetas" class="horizontal w100 border">
+                        <zing-grid
+                            :caption="constituentCode+' Beta Values'"
+                            :data.prop="constituentBetaData" 
+                            layout="row"
+                            filter 
+                            pager
+                            sort>
+                            <zg-colgroup>
+                                <zg-column header="Code" index="IndexCode" filter="disabled" sort="disabled" width="150"></zg-column>
+                                <zg-column index="Beta" filter="disabled" cell-class="betaCellFunction" type="number" type-number-decimals="2"></zg-column>
+                                <zg-column index="TotalRisk" filter="disabled" type="number" type-number-decimals="2"></zg-column>
+                                <zg-column index="UniqueRisk" filter="disabled" type="number" type-number-decimals="2"></zg-column>
+                            </zg-colgroup>
+                        </zing-grid>
+                    </div>
+                </transition>
+                
+                <transition name="fade">
+                    <div v-if="!showBetas" class="horizontal w100 border">
+                        <zingchart :plotid="capChartId" :data="capChartData"></zingchart>
+                    </div>
+                </transition>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
+    import axios from 'axios'
     import { ModelSelect } from 'vue-search-select'
-    import Navbar from '@/components/Navbar'
-    import Sidebar from '@/components/Sidebar'
+    import {Circle9} from 'vue-loading-spinner'
 
     export default {
-        components: {
-            ModelSelect,
-            Navbar,
-            Sidebar
+        props: {
+            data: {
+                type: Object
+            }
         },
         methods: {
+            showBetaTable() {
+                this.showBetas = !this.showBetas
+                if (this.showBetas){
+                    this.showBetasText = "Hide Beta Table"
+                }else{
+                    this.showBetasText = "Show Beta Table"
+                }
+            },
             prepareConstituentData(constituentData){
                 var constituentCode = constituentData["alpha"]
                 console.log("** new constituent "+constituentCode)
@@ -77,12 +141,12 @@
                 var plotData = {
                     type: 'line',
                     legend: {
-                        /*header: {
-                            text: "Beta: "+beta+
-                            "\nAlpha: "+alpha+
-                            "\nTotal Risk: "+totalRisk+
-                            "\nUnique Risk: "+uniqueRisk
-                        }*/
+                        'draggable': true,
+                        header: {
+                            text: 
+                                "* Drag to reposition"+
+                                "\n* Click items to hide"
+                        }
                     },
                     'crosshair-x': {},
                     "plot": {
@@ -118,39 +182,26 @@
                         fontFamily: 'Lato',
                         fontSize: '20px'
                     },
-                    series: [
-                        //{ values: equitySeries, text: key+' Returns'},
-                        //{ values: indexSeries, text:  indexCode+' Returns'}
-                    ]
+                    series: []
                 }
 
                 return plotData
             },
-            registerChartEvents(){
-                zingchart.node_click = function(data){ 
-                    console.log(data)
-                }
-            },
-            plotConstituentData(){
+            fillConstituentInfo() {
                 var data = this.results
                 let indexCode = data["code"]
 
                 var key = this.constituentCode
                 let constituent = data["constituents"][key]
 
-                let equityData = constituent["EquityData"][this.date]
-                let indexData = constituent["IndexEquityData"][this.date]
-
-                let equitySeries = [], indexSeries = []
-
                 let monthNames = [
                     "Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
                 ];
 
                 let betaData = constituent["Beta"]
-                let seriesText = key+' - Beta: Not Found'
+                this.constituentBetaData = constituent["Beta"]
 
-                if (betaData !== null){
+                if (betaData !== null) {
                     let alpha = parseFloat(betaData["Alpha"]).toFixed(2)
                     let beta = parseFloat(betaData["Beta"]).toFixed(2)
                     let totalRisk = parseFloat(betaData["TotalRisk"]).toFixed(5)
@@ -163,7 +214,27 @@
                     let sy = startDate.getFullYear().toString().substr(-2);
                     let ey = endDate.getFullYear().toString().substr(-2);
 
-                    seriesText = key+' - Beta: '+beta +' ( '+sm+' '+sy+' - '+em+' '+ey+' )'
+                    this.items.push({ Code: key, Beta: beta, total_risk: totalRisk, unique_risk: uniqueRisk})
+                }
+            },
+            plotConstituentData(reset) {
+                var data = this.results
+                let indexCode = data["code"]
+
+                var key = this.constituentCode
+                let constituent = data["constituents"][key]
+
+                let equityData = constituent["EquityData"][this.date]
+                let indexData = constituent["IndexEquityData"][this.date]
+
+                let equitySeries = [], indexSeries = []
+
+                let betaData = constituent["Beta"]
+                let seriesText = key+' - Beta: Not Found'
+
+                if (betaData !== null){
+                    this.fillConstituentInfo()
+                    seriesText = key
                 }
 
                 console.log("consituent: "+key)
@@ -177,11 +248,11 @@
                     equitySeries.push([equityDate,equityReturn])
                     indexSeries.push([indexDate,indexReturn])
                 }
- 
+                
                 var series = this.equityChartData["series"]
 
                 // First time being plotted
-                if (!series){
+                if (!series || reset){
                     series = []
                 }
 
@@ -193,7 +264,7 @@
                 if (series.length == 1){
                     series.push({ 
                         values: indexSeries, 
-                        text: indexCode+' - Beta: 1'
+                        text: indexCode
                     })
                 }
 
@@ -210,7 +281,7 @@
                 for (var key in constituents) {
                     if (!firstKey) firstKey = key
                     var constituent = constituents[key]
-                    constituentCodes.push({ value: constituent["alpha"], text: constituent["alpha"] })
+                    constituentCodes.push({ value: constituent["alpha"], text: constituent["Instrument"] })
                 }
                 this.constituentCodes=constituentCodes;
 
@@ -247,6 +318,35 @@
                     this.date=dates[0].value
                 }
             },
+            registerChartEvents(){
+                var self = this
+                zingchart.node_click = function(data){
+                    var alpha = data["text"]
+                    if (alpha in self.detached){
+                        delete self.detached[alpha];
+                    }else {
+                        self.detached[alpha] = true
+                        self.constituentCode = alpha
+                        self.filter()
+                    }
+                }
+                var betaCellFunction = function(openValue, cellDOMRef, cellRef){
+                    var beta = parseFloat(openValue)
+                    if (beta > 1){
+                        return 'red'
+                    }
+
+                    if (beta <= 1 && beta >= 0){
+                        return 'green'
+                    }
+
+                    return 'orange';
+                }
+
+                // set up zinggrid
+                this.zinggrid = document.querySelector('zing-grid')
+                ZingGrid.registerMethod(betaCellFunction, 'betaCellFunction', this)
+            },
             plotIndexData(){
                 var data = this.results
                 
@@ -257,41 +357,55 @@
                 constituentValues.sort((a, b) => (parseFloat(a["weight"]) > parseFloat(b["weight"])) ? -1 : 1);
         
                 let weightSeries = []
-                let totalWeight = 0
-                // Show top 10 index contributors and the rest group them up
-                for (var i=0; i < Math.min(constituentValues.length,20); i++) {
+                for (var i=0; i < constituentValues.length; i++){
                     var constituent = constituentValues[i]
                     var weight = parseFloat(constituent["weight"])
-                    totalWeight += weight
-                    weightSeries.push({ values: [weight], text: constituent["alpha"]}) 
+                    weightSeries.push({ 
+                        values: [weight], 
+                        text: constituent["alpha"],
+                        tooltipText: constituent["alpha"]
+                    }) 
                 }
-                weightSeries.push({ values: [100 - totalWeight], text: "Other" })
                 
-                this.capChartData = {
-                    type: 'pie',
-                    scaleX: {
-                        zooming: true //sets zooming along scaleX
-                    },
-                    scaleY: {
-                        zooming: true //sets zooming along scaleY
-                    },
-                    plot: {
-                        borderColor: "#2B313B",
-                        borderWidth: 2,
-                        valueBox: {
-                            placement: 'out',
-                            text: '%t\n%npv%',
-                            fontFamily: "Open Sans"
-                        }
-                    },
-                    title: {
-                        text: "Index Capitalisation",
-                        padding: '15px',
-                        fontColor: '#1E5D9E',
-                        fontFamily: 'Lato',
-                        fontSize: '20px'
-                    },
-                    series: weightSeries
+                this.capChartData = { 
+                    graphset: [{
+                        type: 'navpie',
+                        others: {
+                            backgroundColor: "#8b0000"
+                        },
+                        options: {
+                            threshold: "1%",
+                            slice: 0.65,
+                            back: {
+                                padding: 10,
+                                fontWeight: "bold",
+                                color: "#fff",
+                                fontSize: 12,
+                                border: "3px solid #47a",
+                                borderRadius: 9,
+                                backgroundColor: "#369",
+                                shadow: true,
+                                shadowAlpha: 0.5
+                            }
+                        },
+                        plot: {
+                            borderColor: "#2B313B",
+                            borderWidth: 2,
+                            valueBox: {
+                                placement: 'out',
+                                text: '%t\n%npv%',
+                                fontFamily: "Open Sans"
+                            }
+                        },
+                        title: {
+                            text: "Index Capitalisation",
+                            padding: '15px',
+                            fontColor: '#1E5D9E',
+                            fontFamily: 'Lato',
+                            fontSize: '20px'
+                        },
+                        series: weightSeries
+                    }]
                 }
             }, 
             filter: function(){
@@ -329,7 +443,7 @@
                     //console.log("got index data")
                     this.results = response.data.results
                     this.prepareIndexData()
-                    this.plotConstituentData()
+                    this.plotConstituentData(true)
                     this.plotIndexData()
                     this.loading = false
                 })
@@ -350,7 +464,7 @@
                 )
                 .then(response => {
                     this.prepareConstituentData(response.data.results)
-                    this.plotConstituentData()
+                    this.plotConstituentData(false)
                     this.loading = false
                 })
                 .catch(e => {
@@ -365,7 +479,7 @@
             .then(response => {
                 this.results = response.data.results
                 this.prepareIndexData()
-                this.plotConstituentData()
+                this.plotConstituentData(true)
                 this.plotIndexData()
                 this.registerChartEvents()
                 this.loading = false
@@ -378,6 +492,8 @@
         data() {
             return {
                 loading: false,
+                showBetas: false,
+                showBetasText: "Show Beta Table",
                 equityChartData: {},
                 equityChartId: 'equityChart',
                 capChartData: {},
@@ -394,38 +510,18 @@
                     {value: '60', text: '5 years'},
                     {value: '120', text: '10 years'},
                 ],
+                items: [],
+                detached: {},
+                constituentBetaData: {},
                 indexCode: '',
                 constituentCode: '',
                 date: '',
                 period: ''
             }
+        },
+        components: {
+            ModelSelect,
+            Circle9
         }
     }
 </script>
-
-<style>
-    .w100 {
-        width: 100%;
-    }
-
-    .w60 {
-        width: 60%;
-    }
-
-    .w40 {
-        width: 40%;
-    }
-
-    .w20 {
-        width: 20%;
-    }
-
-    .horizontal div {
-        display: inline-block;
-        margin: 2px;
-    }
-
-    .horizontal-no-margin div {
-        display: inline-block;
-    }
-</style>

@@ -1,7 +1,10 @@
 <template>
     <div id="app">
-        <Navbar/>
-        <Sidebar/>
+        <div class="loader" v-if="loading">
+            <div>
+                <circle9></circle9>
+            </div>
+        </div>
         <div id="app-container">
             <div class="horizontal-no-margin">
                     <div class="horizontal w100">
@@ -64,12 +67,14 @@
     import { ModelSelect } from 'vue-search-select'
     import Navbar from '@/components/Navbar'
     import Sidebar from '@/components/Sidebar'
+    import {Circle9} from 'vue-loading-spinner'
 
     export default {
         components: {
             ModelSelect,
             Navbar,
-            Sidebar
+            Sidebar,
+            Circle9
         },
         methods: {
             downloadTable: function() {
@@ -98,6 +103,7 @@
             },
             
             createTable: function(){
+                this.loading = true
                 axios.get(
                             'http://localhost:3000/api/downloads/'+
                             this.table+'/'+
@@ -106,6 +112,7 @@
                             '/period/'+this.period
                     )
                 .then(response => {
+                    this.loading = false
                     this.gridData = null
                     this.loaded = false
                     this.possible_columns = []
@@ -147,6 +154,7 @@
         },
         data() {
             return {
+                loading: false,
                 gridData: {},
                 results: {},
                 loaded: false,
