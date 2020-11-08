@@ -34,6 +34,11 @@ const PortfolioMetrics = sequelize.define('PortfolioMetrics', {
     },
     PortfolioSystemicVolatility: {
         type: DataTypes.FLOAT,
+        field: 'port_sys_vol',
+        allowNull: false
+    },
+    PortfolioSpecificVolatility: {
+        type: DataTypes.FLOAT,
         field: 'port_spec_vol',
         allowNull: false
     },
@@ -41,37 +46,37 @@ const PortfolioMetrics = sequelize.define('PortfolioMetrics', {
         type: DataTypes.FLOAT,
         field: 'port_vol',
         allowNull: false
+    },
+    SystemicCovMatrix: {
+        type: DataTypes.STRING('MAX'),
+        field: 'sys_cov_mat',
+        allowNull: false
+    },
+    SpecificCovMatrix: {
+        type: DataTypes.STRING('MAX'),
+        field: 'spec_cov_mat',
+        allowNull: false
+    },
+    TotalCovMatrix: {
+        type: DataTypes.STRING('MAX'),
+        field: 'total_cov_mat',
+        allowNull: false
+    },
+    CorrelationMatrix: {
+        type: DataTypes.STRING('MAX'),
+        field: 'corr_mat',
+        allowNull: false
+    },
+    MatrixID: {
+        type: DataTypes.STRING('MAX'),
+        field: 'mat_id',
+        allowNull: false
+    },
+    SharesExcluded: {
+        type: DataTypes.STRING,
+        field: 'shares_excl',
+        allowNull: false
     }
-    // SystemicCovMatrix: {
-    //     type: DataTypes.ARRAY(DataTypes.ARRAY(DataTypes.FLOAT)),
-    //     field: 'sys_cov_mat',
-    //     allowNull: false
-    // },
-    // SpecificCovMatrix: {
-    //     type: DataTypes.ARRAY(DataTypes.ARRAY(DataTypes.FLOAT)),
-    //     field: 'spec_cov_mat',
-    //     allowNull: false
-    // },
-    // TotalCovMatrix: {
-    //     type: DataTypes.ARRAY(DataTypes.ARRAY(DataTypes.FLOAT)),
-    //     field: 'total_cov_mat',
-    //     allowNull: false
-    // },
-    // CorrelationMatrix: {
-    //     type: DataTypes.ARRAY(DataTypes.ARRAY(DataTypes.FLOAT)),
-    //     field: 'corr_mat',
-    //     allowNull: false
-    // },
-    // MatrixID: {
-    //     type: DataTypes.ARRAY,
-    //     field: 'mat_id',
-    //     allowNull: false
-    // },
-    // SharesExcluded: {
-    //     type: DataTypes.ARRAY(DataTypes.STRING),
-    //     field: 'shares_excl',
-    //     allowNull: false
-    // }
 }, {
     tableName: 'portfolio_metrics',
     timestamps: false

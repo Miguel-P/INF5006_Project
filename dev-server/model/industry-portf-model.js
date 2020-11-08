@@ -46,11 +46,11 @@ const IndustryPortfolioMetrics = sequelize.define('IndustryPortfolioMetrics', {
         type: DataTypes.FLOAT,
         field: 'specVol',
         allowNull: false
+    },
+    SharesExcluded: {
+        type: DataTypes.STRING(64),
+        field: 'shares_excl'
     }
-    // SharesExcluded: {
-    //     type: DataTypes.ARRAY(DataTypes.STRING),
-    //     field: 'shares_excl'
-    // }
 }, {
     tableName: 'industry_portfolio_metrics',
     timestamps: false

@@ -16,6 +16,12 @@ const SharesMetrics = sequelize.define('SharesMetrics', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    MarketIndex: {
+        primaryKey: true,
+        field: 'mkt_index_code',
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     ShareCode: {
         primaryKey: true,
         field: 'share_code',
