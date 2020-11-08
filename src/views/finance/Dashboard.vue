@@ -81,30 +81,119 @@
 
             <div class="w40 h100 top">
                 <div class="horizontal w100 margined-s">
-                    <input type="button" :value="showBetasText"  @click="showBetaTable()" class="btn btn-info w60"/>
+                    <input 
+                        type="button" 
+                        value="Pie Chart"  
+                        @click="showTable(pieChartId)" 
+                        class="btn btn-info margined-s"/>
+                    <input 
+                        type="button" 
+                        value="Betas"  
+                        @click="showTable(betasTableId)" 
+                        class="btn btn-info margined-s"/>
+                    <input 
+                        type="button" 
+                        value="Unique Risk"  
+                        @click="showTable(uniqueRiskTableId)" 
+                        class="btn btn-info margined-s"/>
+                    <input 
+                        type="button" 
+                        value="Total Risk"  
+                        @click="showTable(totalRiskTableId)" 
+                        class="btn btn-info margined-s"/>
+                    <!--<b-icon 
+                        type="button" 
+                        @click="showTable(betasTableId)" 
+                        icon="bootstrap-fill" 
+                        class="md-icon rounded-circle bg-info" 
+                        variant="light">
+                    </b-icon> -->
                 </div>
+
+                <transition name="fade">
+                    <div v-if="showPieChart" class="horizontal w100 border">
+                        <zingchart :plotid="capChartId" :data="capChartData"></zingchart>
+                    </div>
+                </transition>
+
                 <transition name="fade">
                     <div v-if="showBetas" class="horizontal w100 border">
                         <zing-grid
-                            :caption="constituentCode+' Beta Values'"
-                            :data.prop="constituentBetaData" 
+                            :id="betasTableId"
+                            :data.prop="constituentBetaData"
+                            layout-controls="disabled"
                             layout="row"
                             filter 
                             pager
+                            page-size="7"
                             sort>
+                            <zg-caption>
+                                {{loadedConstituentCode+' Beta Values'}}
+                                <input type="button" value="Export" @click="exportData(betasTableId)" class="btn btn-info right"/>
+                            </zg-caption>
                             <zg-colgroup>
-                                <zg-column header="Code" index="IndexCode" filter="disabled" sort="disabled" width="150"></zg-column>
-                                <zg-column index="Beta" filter="disabled" cell-class="betaCellFunction" type="number" type-number-decimals="2"></zg-column>
-                                <zg-column index="TotalRisk" filter="disabled" type="number" type-number-decimals="2"></zg-column>
-                                <zg-column index="UniqueRisk" filter="disabled" type="number" type-number-decimals="2"></zg-column>
+                                <zg-column index="Date" filter="disabled"></zg-column>
+                                <zg-column index="J200_BT" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J203_BT" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J250_BT" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J257_BT" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J258_BT" filter="disabled" cell-class="betaCellFunction"></zg-column>
                             </zg-colgroup>
                         </zing-grid>
                     </div>
                 </transition>
-                
+
                 <transition name="fade">
-                    <div v-if="!showBetas" class="horizontal w100 border">
-                        <zingchart :plotid="capChartId" :data="capChartData"></zingchart>
+                    <div v-if="showUniqueRisk" class="horizontal w100 border">
+                        <zing-grid
+                            :id="betasTableId"
+                            :data.prop="constituentBetaData"
+                            layout-controls="disabled"
+                            layout="row"
+                            filter 
+                            pager
+                            page-size="7"
+                            sort>
+                            <zg-caption>
+                                {{loadedConstituentCode+' Unique Risk Values'}}
+                                <input type="button" value="Export" @click="exportData(uniqueRiskTableId)" class="btn btn-info right"/>
+                            </zg-caption>
+                            <zg-colgroup>
+                                <zg-column index="Date" filter="disabled"></zg-column>
+                                <zg-column index="J200_UR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J203_UR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J250_UR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J257_UR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J258_UR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                            </zg-colgroup>
+                        </zing-grid>
+                    </div>
+                </transition>
+
+                <transition name="fade">
+                    <div v-if="showTotalRisk" class="horizontal w100 border">
+                        <zing-grid
+                            :id="betasTableId"
+                            :data.prop="constituentBetaData"
+                            layout-controls="disabled"
+                            layout="row"
+                            filter
+                            pager
+                            page-size="7"
+                            sort>
+                            <zg-caption>
+                                {{loadedConstituentCode+' Total Risk Values'}}
+                                <input type="button" value="Export" @click="exportData(totalRiskTableId)" class="btn btn-info right"/>
+                            </zg-caption>
+                            <zg-colgroup>
+                                <zg-column index="Date" filter="disabled"></zg-column>
+                                <zg-column index="J200_TR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J203_TR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J250_TR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J257_TR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J258_TR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                            </zg-colgroup>
+                        </zing-grid>
                     </div>
                 </transition>
             </div>
@@ -124,12 +213,48 @@
             }
         },
         methods: {
-            showBetaTable() {
-                this.showBetas = !this.showBetas
-                if (this.showBetas){
-                    this.showBetasText = "Hide Beta Table"
+            exportData(gridId){
+                const zgRef = document.getElementById(gridId);
+                const gridData = zgRef.getData({
+                    csv: true,
+                    headers: true,
+                    cols: "visible"
+                });
+                var hiddenElement = document.createElement('a');
+                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(gridData);
+                hiddenElement.target = '_blank';
+                hiddenElement.download = gridId+'.csv';
+                hiddenElement.click();
+            },
+            showTable(gridId) {
+                if (gridId == this.pieChartId){
+                    this.showPieChart=true
                 }else{
-                    this.showBetasText = "Show Beta Table"
+                    this.showPieChart=false
+                }
+
+                if (gridId == this.betasTableId){
+                    this.showBetas=true
+                }else{
+                    this.showBetas=false
+                }
+                
+                if (gridId == this.uniqueRiskTableId){
+                    this.showUniqueRisk=true
+                }else{
+                    this.showUniqueRisk=false
+                }
+                
+                if (gridId == this.totalRiskTableId){
+                    this.showTotalRisk=true
+                }else{
+                    this.showTotalRisk=false
+                }
+                
+                if (gridId == this.alphasTableId){
+                    this.showAlphas=true
+                }else{
+                    this.showAlphas=false
                 }
             },
             prepareConstituentData(constituentData){
@@ -137,7 +262,7 @@
                 console.log("** new constituent "+constituentCode)
                 this.results["constituents"][constituentCode] = constituentData
             },
-            getEquityPlotData(){
+            getEquityPlotData() {
                 var plotData = {
                     type: 'line',
                     legend: {
@@ -200,6 +325,7 @@
 
                 let betaData = constituent["Beta"]
                 this.constituentBetaData = constituent["Beta"]
+                this.loadedConstituentCode = this.constituentCode
 
                 if (betaData !== null) {
                     let alpha = parseFloat(betaData["Alpha"]).toFixed(2)
@@ -492,7 +618,15 @@
         data() {
             return {
                 loading: false,
+                showPieChart: true,
                 showBetas: false,
+                showUniqueRisk: false,
+                showTotalRisk: false,
+                showAlphas: false,
+                pieChartId: "pieChart",
+                betasTableId: "betasGrid",
+                uniqueRiskTableId: "uniqueRiskGrid",
+                totalRiskTableId: "totalRiskGrid",
                 showBetasText: "Show Beta Table",
                 equityChartData: {},
                 equityChartId: 'equityChart',
@@ -515,6 +649,7 @@
                 constituentBetaData: {},
                 indexCode: '',
                 constituentCode: '',
+                loadedConstituentCode: '',
                 date: '',
                 period: ''
             }

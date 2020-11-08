@@ -25,29 +25,67 @@
                     <input type="button" value="Get Data"  @click="getBetaData()" class="btn btn-info w60"/>
                 </div>
             </div>
-            <zing-grid 
-                caption="Share Betas"
-                draggable="columns" 
-                drag-action="reorder" 
-                :data.prop="sharesBetaData" 
-                filter 
-                pager
-                sort>
-                <zg-colgroup>
-                    <zg-column index="InstrumentCode" filter="disabled" sort="disabled"></zg-column>
-                    <zg-column index="FirstTrade" filter="disabled" sort="disabled" width="150"></zg-column>
-                    <zg-column index="LastTrade" filter="disabled" sort="disabled" width="150"></zg-column>
-                    <zg-column index="J200" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                    <zg-column index="J203" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                    <zg-column index="J250" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                    <zg-column index="J257" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                    <zg-column index="J258" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                    <zg-column index="Industry" sort="disabled" width="200" type="select" :type-select-options="industries"></zg-column>
-                    <zg-column index="SuperSector" sort="disabled" width="250" type="select" :type-select-options="superSectors"></zg-column>
-                    <zg-column index="Sector" sort="disabled" width="300" type="select" :type-select-options="sectors"></zg-column>
-                    <zg-column index="SubSector" sort="disabled" width="350" type="select" :type-select-options="subSectors"></zg-column>
-                </zg-colgroup>
-            </zing-grid>
+            <transition name="fade">
+            <div v-if="showShares">
+                <zing-grid
+                    :id="shareBetasTableId"
+                    draggable="columns" 
+                    drag-action="reorder" 
+                    :data.prop="sharesBetaData" 
+                    filter 
+                    pager
+                    sort>
+                    <zg-caption>
+                        Share Betas
+                        <input type="button" value="Export" @click="exportData(shareBetasTableId)" class="btn btn-info right"/>
+                    </zg-caption>
+                    <zg-colgroup>
+                        <zg-column type="selector"></zg-column>
+                        <zg-column index="InstrumentName" cell-break="ellipsis" cell-tooltip-action="hover" cell-tooltip-text="[[record.InstrumentName]]" sort="disabled"></zg-column>
+                        <zg-column index="FirstTrade" filter="disabled" sort="disabled" width="150"></zg-column>
+                        <zg-column index="LastTrade" filter="disabled" sort="disabled" width="150"></zg-column>
+                        <zg-column index="J200" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                        <zg-column index="J203" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                        <zg-column index="J250" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                        <zg-column index="J257" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                        <zg-column index="J258" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                        <zg-column index="Industry" sort="disabled" width="200" type="select" :type-select-options="industries"></zg-column>
+                        <zg-column index="SuperSector" sort="disabled" width="250" type="select" :type-select-options="superSectors"></zg-column>
+                        <zg-column index="Sector" sort="disabled" width="300" type="select" :type-select-options="sectors"></zg-column>
+                        <zg-column index="SubSector" sort="disabled" width="350" type="select" :type-select-options="subSectors"></zg-column>
+                    </zg-colgroup>
+                </zing-grid>
+            </div>
+            </transition>
+
+            <transition name="fade">
+            <div v-if="!showShares">
+                <zing-grid
+                    :id="indexBetasTableId"
+                    draggable="columns" 
+                    drag-action="reorder" 
+                    :data.prop="indexesBetaData"
+                    filter 
+                    pager
+                    sort>
+                    <zg-caption>
+                        Index Betas
+                        <input type="button" value="Export" @click="exportData(indexBetasTableId)" class="btn btn-info right"/>
+                    </zg-caption>
+                    <zg-colgroup>
+                        <zg-column index="IndexCode" cell-tooltip-action="hover" cell-tooltip-text="[[record.IndexName]]" filter="disabled" sort="disabled"></zg-column>
+                        <zg-column index="FirstTrade" filter="disabled" sort="disabled" width="150"></zg-column>
+                        <zg-column index="LastTrade" filter="disabled" sort="disabled" width="150"></zg-column>
+                        <zg-column index="J200" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                        <zg-column index="J203" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                        <zg-column index="J250" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                        <zg-column index="J257" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                        <zg-column index="J258" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                        <zg-column index="IndexType" sort="disabled" width="200" type="select" :type-select-options="indexTypes"></zg-column>
+                    </zg-colgroup>
+                </zing-grid>
+            </div>
+            </transition>
         </div>
     </div>
 </template>
@@ -64,8 +102,22 @@
             }
         },
         methods: {
+            exportData(gridId){
+                const zgRef = document.getElementById(gridId);
+                const gridData = zgRef.getData({
+                    csv: true,
+                    headers: true,
+                    cols: "visible"
+                });
+                var hiddenElement = document.createElement('a');
+                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(gridData);
+                hiddenElement.target = '_blank';
+                hiddenElement.download = gridId+'.csv';
+                hiddenElement.click();
+            },
             registerGridMethods(){
-                var betaCellFunction = function(openValue, cellDOMRef, cellRef){
+                self = this
+                var betaCellFunction = function(openValue, cellDOMRef, cellRef){ 
                     var beta = parseFloat(openValue)
                     if (beta > 1){
                         return 'red'
@@ -96,30 +148,46 @@
                     this.date=dates[0].value
                 }
 
-                this.sharesBetaData = data["betas"]
+                if (this.table === "sharetable"){
+                    this.sharesBetaData = data["betas"]
 
-                // Get Industry Array
-                let industryValues = this.sharesBetaData.map(a => a["Industry"])
-                let uniqueIndustries = Array.from(new Set(industryValues))
-                this.industries = JSON.stringify(uniqueIndustries)
+                    // Get Industry Array
+                    let industryValues = this.sharesBetaData.map(a => a["Industry"])
+                    let uniqueIndustries = Array.from(new Set(industryValues))
+                    this.industries = JSON.stringify(uniqueIndustries)
 
-                let superSectorValues = this.sharesBetaData.map(a => a["SuperSector"])
-                let uniqueSuperSectors = Array.from(new Set(superSectorValues))
-                this.superSectors = JSON.stringify(uniqueSuperSectors)
+                    let superSectorValues = this.sharesBetaData.map(a => a["SuperSector"])
+                    let uniqueSuperSectors = Array.from(new Set(superSectorValues))
+                    this.superSectors = JSON.stringify(uniqueSuperSectors)
 
-                let sectorValues = this.sharesBetaData.map(a => a["Sector"])
-                let uniqueSectors = Array.from(new Set(sectorValues))
-                this.sectors = JSON.stringify(uniqueSectors)
+                    let sectorValues = this.sharesBetaData.map(a => a["Sector"])
+                    let uniqueSectors = Array.from(new Set(sectorValues))
+                    this.sectors = JSON.stringify(uniqueSectors)
 
-                let subSectorValues = this.sharesBetaData.map(a => a["SubSector"])
-                let uniqueSubSectors = Array.from(new Set(subSectorValues))
-                this.subSectors = JSON.stringify(uniqueSubSectors)
+                    let subSectorValues = this.sharesBetaData.map(a => a["SubSector"])
+                    let uniqueSubSectors = Array.from(new Set(subSectorValues))
+                    this.subSectors = JSON.stringify(uniqueSubSectors)
+
+                    this.showShares = true
+                }else{
+                    this.indexesBetaData = data["betas"]
+
+                    let indexTypeValues = this.indexesBetaData.map(a => a["IndexType"])
+                    let uniqueTypes = Array.from(new Set(indexTypeValues))
+                    this.indexTypes = JSON.stringify(uniqueTypes)
+
+                    this.showShares = false
+                }
             },
             getBetaData(){
                 this.loading = true
+                var betaType = "index_constituents"
+                if (this.table !== "sharetable"){
+                    betaType = "indexes"
+                }
                 axios.get(
                     'http://localhost:3000/api'+
-                    '/index_constituents'+
+                    '/'+betaType+
                     '/betas'+
                     '/date/'+this.date
                 )
@@ -152,12 +220,17 @@
         data() {
             return {
                 loading: true,
+                showShares: true,
                 results: {},
                 industries: '',
                 superSectors: '',
                 sectors: '',
                 subSectors: '',
+                indexTypes: '',
+                indexBetasTableId: "indexTable",
+                shareBetasTableId: "shareTable",
                 sharesBetaData: {},
+                indexesBetaData: {},
                 dates: [],
                 date: '',
                 tables: [
