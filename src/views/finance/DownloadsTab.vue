@@ -15,7 +15,13 @@
                                 placeholder="Select Table">
                             </model-select>
                         </div>
-
+                        <div class="w20" v-if="index_and_share_codes_req">  
+                        <model-select 
+                                :options="index_codes"
+                                v-model="index_code"
+                                placeholder="Select Index Code">
+                            </model-select>
+                        </div>
                         <div class="w20">  
                             <model-select 
                                 :options="marketProxies"
@@ -23,7 +29,13 @@
                                 placeholder="Select Market Proxy">
                             </model-select>
                         </div>
-
+                        <div class="w20" v-if="index_and_share_codes_req"> 
+                            <model-select 
+                                :options="share_codes"
+                                v-model="share_code"
+                                placeholder="Select Share Code">
+                            </model-select>
+                        </div>
                         <div class="w20">
                             <model-select 
                                 :options="dates"
@@ -234,7 +246,7 @@
                 // console.log("response", response)
                 var shareCodesArray = response.data["message"]
                 for (var i=0; i <shareCodesArray.length; i++) {
-                    var share_code = shareCodesArray[i]
+                    var share_code = shareCodesArray[i].share_code
                     this.share_codes.push({ value: share_code, text: share_code })
                 }
             })
@@ -248,7 +260,7 @@
                 // console.log("response", response)
                 var indexCodesArray = response.data["message"]
                 for (var i=0; i <indexCodesArray.length; i++) {
-                    var index_code = indexCodesArray[i]
+                    var index_code = indexCodesArray[i].index_code
                     this.index_codes.push({ value: index_code, text: index_code })
                 }
             })
@@ -288,12 +300,13 @@
                     {value: '120', text: '10 years'},
                 ],
                 period: '',
-                share_codes: ['View All'],
-                share_code: 'View All',
+                share_codes: [],
+                share_code: '',
                 index_codes: [],
-                index_code: 'ALSI',
+                index_code: '',
                 selected_columns: [],
-                possible_columns: []
+                possible_columns: [],
+                index_and_share_codes_req: false
             }
         },
         watch: {
@@ -307,9 +320,14 @@
                 }
             },
             table: function () {
-                if (this.table == "shareMetrics_table") {
-                    // change the dropdown selectors
-                    // should give options for: index, mkt_index, share_code (with the option to leave share code blank)
+                if (this.table == "sharesMetrics" || this.table == "indusPortfMetrics") {
+                    this.index_and_share_codes_req = true
+                    this.marketProxy = ''
+                    this.date = ''
+                    this.period = ''
+                }
+                else {
+                    this.index_and_share_codes_req = false
                 }
             }
         }
