@@ -72,4 +72,5 @@
 
 <style>
   @import './assets/css/style.css';
+  @import './assets/css/templatemo-style.css';
 </style>
