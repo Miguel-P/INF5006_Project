@@ -150,6 +150,7 @@ class IndexConstituent {
                 
                 var index = betaModel['IndexCode']
                 betaData[date][index+"_BT"] = parseFloat(betaModel['Beta']).toFixed(2)
+                betaData[date][index+"_AL"] = parseFloat(betaModel['Alpha']).toFixed(4)
                 betaData[date][index+"_UR"] = parseFloat(betaModel['UniqueRisk']).toFixed(2)
                 betaData[date][index+"_TR"] = parseFloat(betaModel['TotalRisk']).toFixed(2)
             }
