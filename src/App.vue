@@ -61,7 +61,7 @@
           },
           {
             href: '/downloads',
-            title: 'Downloads',
+            title: 'Custom Tables',
             icon: 'fa fa-download',
           }
         ]
