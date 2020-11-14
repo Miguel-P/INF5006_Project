@@ -55,6 +55,11 @@
             icon: 'fa fa-table'
           },
           {
+            href: '/indexmetrics',
+            title: 'Index Metrics',
+            icon: 'fa fa-chart-bar'
+          },
+          {
             href: '/downloads',
             title: 'Downloads',
             icon: 'fa fa-download',

@@ -22,7 +22,7 @@ class IndexConstituent {
         // Get all dates
         await BetaModel.findAll({
             attributes: [[sequelize.fn('DISTINCT', sequelize.col('Date')), 'Date']],
-            order: [ [ 'Date', 'DESC' ]]
+            order: [[ 'Date', 'DESC' ]]
         })
         .then(function(dates){
             console.log("**** index rep dates "+JSON.stringify(dates));
@@ -136,7 +136,24 @@ class IndexConstituent {
     static async getConstituentData(indexCode, constituent, period){
         await constituent.getBetaData(indexCode)
         .then(function(betaModels) {
-            constituent.Beta = betaModels
+            var betaData = {}
+
+            // Put the beta calculations with calculation date as key in the betadata array
+            for (var j = 0; j < betaModels.length; j++) {
+                var betaModel = betaModels[j];
+                var date = betaModel['Date']
+                if (!(date in betaData)){
+                    betaData[date] = {}
+                    betaData[date]['Date'] = date
+                    betaData[date]['StartDate'] = betaModel['StartDate']
+                }
+                
+                var index = betaModel['IndexCode']
+                betaData[date][index+"_BT"] = parseFloat(betaModel['Beta']).toFixed(2)
+                betaData[date][index+"_UR"] = parseFloat(betaModel['UniqueRisk']).toFixed(2)
+                betaData[date][index+"_TR"] = parseFloat(betaModel['TotalRisk']).toFixed(2)
+            }
+            constituent.Beta = betaData
         })
         .catch(function (err) {
             console.log("*** error getting beta: "+err);
@@ -201,11 +218,12 @@ class IndexConstituent {
     async getBetaData(indexCode) {
         return await BetaModel.findAll({
             where: sequelize.literal(
-                " MONTH([Date]) = MONTH('"+this.date+"') AND"+
-                " YEAR([Date]) = YEAR('"+this.date+"') AND"+
+                //" MONTH([Date]) = MONTH('"+this.date+"') AND"+
+                //" YEAR([Date]) = YEAR('"+this.date+"') AND"+
                 " Instrument = '"+this.alpha+"'"
                 //" [Index] = '"+indexCode+"'"
-            )
+            ),
+            order: [ [ 'Date', 'DESC' ]]
         });
     }
 

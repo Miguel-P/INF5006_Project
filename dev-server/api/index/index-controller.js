@@ -47,3 +47,38 @@ export function get_index(req, res) {
         return res.status(400).json({ error: err });
     });
 }
+
+export function get_index_beta_data(req, res) {
+    var date = req.params["date"]
+
+    IndexRep.getIndexBetaData(date)
+    .then(function(results){
+        if (results["success"] == 1) {
+            return res.status(200).json({ results: results["data"] });
+        }
+        return res.status(400).json({ error: results["message"] });
+    })
+    .catch(function (err) {
+        console.log("** cont err 1 "+err)
+        return res.status(400).json({ error: err });
+    });
+}
+
+// http://localhost:3000/api/indexes/metrics/Weight/index/TOPI/marketindex/J203
+export function get_index_metric_data(req, res) {
+    var metricType = req.params["type"]
+    var indexCode = req.params["code"]
+    var mktCode = req.params["mktcode"]
+
+    IndexRep.getIndexMetricData(metricType, indexCode, mktCode)
+    .then(function(results){
+        if (results["success"] == 1) {
+            return res.status(200).json({ results: results["data"] });
+        }
+        return res.status(400).json({ error: results["message"] });
+    })
+    .catch(function (err) {
+        console.log("** contr metric erro "+err)
+        return res.status(400).json({ error: err });
+    });
+}

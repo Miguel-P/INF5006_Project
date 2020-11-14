@@ -1,5 +1,8 @@
 import {sequelize} from '../api/config/db';
 var IndexConstituentModel = require('../model/index_constituent-model').default;
+var IndexMetricModel = require('../model/index_metric-model').default;
+var IndexModel = require('../model/index-model').default;
+var BetaModel = require('../model/beta-model').default;
 var IndexConstituentRep = require('./index_constituent-repository').default;
 
 class Index {
@@ -111,6 +114,132 @@ class Index {
         results["success"] = 1
         results["message"] = "Success"
         results["data"] = constituent
+        return results
+    }
+
+    static async getIndexBetaData(date){
+        var results = {"success":0};
+        results["data"] = {}
+        var betaAttributes = ['StartDate','Date','IndexCode','Beta','DataPoints','DaysTraded']
+        var betaDates;
+        
+        // Get all dates
+        await BetaModel.findAll({
+            attributes: [[sequelize.fn('DISTINCT', sequelize.col('Date')), 'Date']],
+            order: [ [ 'Date', 'DESC' ]]
+        })
+        .then(function(dates){
+            console.log("**** index rep dates "+JSON.stringify(dates));
+            betaDates = dates;
+        })
+        .catch(function (err) {
+            results["message"] = err;
+            console.log("*** dates error "+err)
+        });
+
+        if (date === undefined) {
+            date = betaDates[0]['Date']
+        }
+
+        await IndexModel.findAll({
+            include: [
+                {model: BetaModel, attributes: betaAttributes, required: true}
+            ],
+            where: sequelize.literal
+            (
+                " MONTH([Beta].[Date]) = MONTH('"+date+"') AND YEAR([Beta].[Date]) = YEAR('"+date+"')"
+            )
+        })
+        .then(function(indexBetaModels){
+            console.log("** beta data "+indexBetaModels.length);
+            
+            var indexBetas = Index.prepareIndexBetaData(indexBetaModels)
+
+            results["success"] = 1
+            results["message"] = "Successful"
+            results["data"]["dates"] = betaDates
+            results["data"]["betas"] = indexBetas
+        }).catch(function (err) {
+            console.log("*** error beta data: "+err);
+            results["message"] = err
+        });
+
+        return results
+    }
+
+    /**
+     * Each index will have an array of betas for the date that was passed
+     * This methods gets those betas and makes one entry that has all the betas
+     * @param {*} indexBetaModels 
+     */
+    static prepareIndexBetaData(indexBetaModels){
+
+        var indexBetas = {}
+
+        //console.log('** cbm: '+JSON.stringify(indexBetaModels[0]))
+        for (var i = 0; i < indexBetaModels.length; i++) {
+            var code = indexBetaModels[i]['IndexCode'];
+            var name = indexBetaModels[i]['IndexName'];
+            var type = indexBetaModels[i]['IndexType'];
+            var betaModels = indexBetaModels[i]['Beta'];
+
+            indexBetas[code] = {}
+            indexBetas[code]['IndexCode'] = code
+            indexBetas[code]['IndexName'] = name
+            indexBetas[code]['IndexType'] = type
+
+            for (var j = 0; j < betaModels.length; j++){
+                var betaModel = betaModels[j];
+                var index = betaModel['IndexCode']
+                indexBetas[code][index] = parseFloat(betaModel['Beta']).toFixed(2)
+            }
+
+            indexBetas[code]['FirstTrade'] = betaModels[0]['StartDate']
+            indexBetas[code]['LastTrade'] = betaModels[0]['Date']
+            indexBetas[code]['DataPoints'] = betaModels[0]['DataPoints']
+            indexBetas[code]['DaysTraded'] = parseFloat(betaModels[0]['DaysTraded']).toFixed(2)
+        }
+
+        return Object.values(indexBetas)
+    }
+
+    static async getIndexMetricData(metricType, indexCode, marketIndexCode) {
+        var results = {"success":0};
+        results["data"] = {}
+        var getAttributes = ['Date','IndexCode','MarketIndexCode','Industry', metricType]
+        
+        await IndexMetricModel.findAll({
+            attributes: getAttributes,
+            where: {
+                IndexCode: indexCode,
+                MarketIndexCode: marketIndexCode
+            }
+        })
+        .then(function(indexMetrics) {
+            var metricData = {}
+
+            // Put the metric data per quarter for selected metric
+            for (var j = 0; j < indexMetrics.length; j++) {
+                var indexMetric = indexMetrics[j];
+                var date = indexMetric['Date']
+                var industry = indexMetric['Industry']
+                if (!(date in metricData)){
+                    metricData[date] = {}
+                    metricData[date]['Date'] = date
+                }
+                
+                metricData[date][industry] = parseFloat(indexMetric[''+metricType]).toFixed(4)
+            }
+
+            results["success"] = 1
+            results["message"] = "Successful"
+            results["data"] = metricData
+        })
+        .catch(function (err) {
+            results["message"] = err;
+            console.log("*** metrics error "+err)
+        });
+
         return results
     }
 }

@@ -39,7 +39,7 @@ IndexConstituent.belongsTo(SubSectorModel, {
 })
 
 IndexConstituent.hasMany(BetaModel, {
-    foreignKey: 'Instrument'//, as: 'ICBSubSector'
+    foreignKey: 'Instrument'
 })
 
 export default IndexConstituent;

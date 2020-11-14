@@ -11,6 +11,7 @@ import VueRouter from 'vue-router'
 import Dashboard from './views/finance/Dashboard.vue'
 import BetaTables from './views/finance/BetaTables.vue'
 import DownloadsTab from './views/finance/DownloadsTab.vue'
+import IndexMetrics from './views/finance/IndexMetrics.vue'
 import About from './views/finance/About.vue'
 
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
@@ -45,6 +46,11 @@ const router = new VueRouter({
       path: '/betatables',
       name: 'BetaTables',
       component: BetaTables
+    },
+    {
+      path: '/indexmetrics',
+      name: 'IndexMetrics',
+      component: IndexMetrics
     },
     {
       path: '/downloads',
