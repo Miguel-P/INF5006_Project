@@ -245,8 +245,8 @@
                 metricTypes: [
                     {value: 'Weight', text: 'Weight'},
                     {value: 'Beta', text: 'Beta'},
-                    {value: 'SystemVolatility', text: 'System Volatility'},
-                    {value: 'SpecificVolatility', text: 'Specific Volatility'}
+                    {value: 'SysVol', text: 'System Volatility'},
+                    {value: 'SpecVol', text: 'Specific Volatility'}
                 ],
                 indexCode: 'TOPI',
                 marketProxy: 'J203',
