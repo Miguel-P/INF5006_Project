@@ -94,7 +94,6 @@
                             <input type="button" value="Create Table"  @click="createTable()" class="btn btn-info w60"/>
                         </div>
                         <div class="w20">
-                                <!-- <button type="submit" onclick="window.open('file.csv')">Download!</button> -->
                                 <input type="button" value="Download Table"  @click="downloadTable()" class="btn btn-info w60"/>
                         </div>
                     </div>
@@ -119,9 +118,6 @@
     import Sidebar from '@/components/Sidebar'
     import {Circle9} from 'vue-loading-spinner'
 
-    // const ZG = document.querySelector('#downloads_table');
-    // ZG.registerMethod('tooltips', renderTooltip);
-
     export default {
         components: {
             ModelSelect,
@@ -130,56 +126,57 @@
             Circle9
         },
         methods: {
+            /**
+            * Fetches the zing-grid column elements from the DOM and manually injects
+            * the tooltip attributes.
+            */
             renderTooltip: function() {
 
                 let zgRef = document.querySelector('#downloads_table');
 
                 if (this.table == "sharesMetrics"){
                    var tooltip_data = this.share_metrics_tooltips
-
                 }
                 else if (this.table == "portfMetrics") {
                     var tooltip_data =  this.portfolio_metrics_tooltips
-
-
                 }
                 else if (this.table == "indusPortfMetrics"){
                     var tooltip_data =  this.industry_portfolio_metrics_tooltips
                 }
-
+                // match the tooltip id to the zing-grid column idea and add the attribute.
                 for (var i = 0; i < tooltip_data.length; i++) {
-                    console.log(tooltip_data[i].column_name)
+                    //console.log(tooltip_data[i].column_name)
                     let zgColumn = zgRef.querySelector('zg-column[index="'+tooltip_data[i].column_name+'"]');
                     zgColumn.setAttribute('header-tooltip-text', tooltip_data[i].description)
-                    zgColumn.setAttribute('header-tooltip-trigger', "text")
+                    zgColumn.setAttribute('header-tooltip-trigger', "text") // prevents icon being created.
                 }
             },
+            /**
+            * Exports the data from the zing-grid table to csv and triggers a download.
+            */
             downloadTable: function() {
-                console.log("Downloading table")
+                //console.log("Downloading table")
+                // Fetch data directly from zing-grid.
                 const data = downloads_table.getData({
                                 csv: true,
                                 headers: true,
                                 cols: "visible",
                                 rows: "visible" 
-                              });                
+                              });  
+                // create download popup.              
                 var hiddenElement = document.createElement('a');
                 hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(data);
                 hiddenElement.target = '_blank';
                 hiddenElement.download = this.table+"_"+this.date+"_period"+this.period+'.csv';
                 hiddenElement.click();
             },
-
-            arrayToCSV: function(objArray) {
-                const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
-                let str = `${Object.keys(array[0]).map(value => `"${value}"`).join(",")}` + '\r\n';
-
-                return array.reduce((str, next) => {
-                    str += `${Object.values(next).map(value => `"${value}"`).join(",")}` + '\r\n';
-                    return str;
-                    }, str);
-            },
+            /**
+            * Extracts the column names from table data returned from web server. Uses it to create to
+            * create checkboxes allowing users to add and remove columns.
+            * @param {object} JSON object returned from an API request for table data.
+            */
             makeColumnSelectors: function(response) {
-                console.log("Making column selectors...")
+                //console.log("Making column selectors...")
                 this.possible_columns = []
                 this.selected_columns = []
                 // fetch the column names from the returned data:
@@ -190,6 +187,9 @@
                 // now display the check box item
                 this.loaded = true
             },
+            /**
+            * Request share metrics data.
+            */
             getSharesMetrics: async function() {
                 if (this.share_code == "View All") {
                     var share_code = ""
@@ -208,12 +208,18 @@
                 )
                 return await response
             },
+            /**
+             * Request the tooltips for the share metrics table
+            */
             getSharesMetricsTooltips: async function() {
                 let response = await axios.get(
                             'http://localhost:3000/api/tooltips/shares_metrics'
                 )
                 return await response
             },
+            /**
+             * Request portfolio metrics table
+             */
             getPortfMetrics: async function() {
                 let response = await axios.get(
                             'http://localhost:3000/api/downloads/'+
@@ -257,8 +263,12 @@
                 )
                 return await response
             },
+            /**
+             * Requests the table data based on the user selected options, then creates table, adds column
+             * selectors and returns.
+             */
             createTable: function(){
-                // first check the invariants and return if false
+                // check the invariants and return if false
                 if (this.table == null) {
                     alert("Please select all of the options before creating the table.")
                     return
@@ -279,7 +289,7 @@
                     this.getStandardTables()
                     .then(response => {
                         this.loading = false
-                        console.log("Table data = ", response.data.message[0])
+                        //console.log("Table data = ", response.data.message[0])
                         this.gridData = response.data.message
                         this.makeColumnSelectors(response)
                     })
@@ -297,7 +307,7 @@
                     this.getSharesMetrics()
                     .then(response => {
                         this.loading = false
-                        console.log("Table data = ", response.data.message[0])
+                        //console.log("Table data = ", response.data.message[0])
                         this.gridData = response.data.message
                         this.makeColumnSelectors(response)
                         this.getSharesMetricsTooltips()
@@ -321,7 +331,7 @@
                     this.getPortfMetrics()
                     .then(response => {
                         this.loading = false
-                        console.log("Table data = ", response.data.message[0])
+                        //console.log("Table data = ", response.data.message[0])
                         this.gridData = response.data.message
                         this.makeColumnSelectors(response)
                         this.getPortfMetrics_tooltips()
@@ -329,7 +339,7 @@
                             this.portfolio_metrics_tooltips = response.data["message"]
                         })
                         .then(
-                            console.log(this.portfolio_metrics_tooltips),
+                            //console.log(this.portfolio_metrics_tooltips),
                             this.renderTooltip()
                         )
                     })
@@ -347,7 +357,7 @@
                     this.getIndusPortfMetrics()
                     .then(response => {
                         this.loading = false
-                        console.log("Table data = ", response.data.message[0])
+                        //console.log("Table data = ", response.data.message[0])
                         this.gridData = response.data.message
                         this.makeColumnSelectors(response)
                         this.getIndustryPortfMetrics_tooltips()
@@ -364,12 +374,16 @@
                 }
             }
         },
+        /**
+         * This function runs when the page is first loaded. It fetches all of the utility data that will
+         * populate the dropdown menus for table specification.
+         */
         created () {
             // get info for drop down selectors
             // get dates
             axios.get('http://localhost:3000/api/downloads/dates')
             .then(response => {
-                console.log("Fetching dates")
+                //console.log("Fetching dates")
                 // console.log("response", response)
                 // since the message is packed with stringify, the output/json obj is an array!
                 var dateArray = response.data["message"]
@@ -385,7 +399,7 @@
             // get the share codes
             axios.get('http://localhost:3000/api/downloads/share_codes')
             .then(response => {
-                console.log("Fetching share codes")
+                //console.log("Fetching share codes")
                 // console.log("response", response)
                 var shareCodesArray = response.data["message"]
                 for (var i=0; i <shareCodesArray.length; i++) {
@@ -399,7 +413,7 @@
             // get the index codes
             axios.get('http://localhost:3000/api/downloads/index_codes')
             .then(response => {
-                console.log("Fetching index codes")
+                //console.log("Fetching index codes")
                 // console.log("response", response)
                 var indexCodesArray = response.data["message"]
                 for (var i=0; i <indexCodesArray.length; i++) {
@@ -466,7 +480,11 @@
                 share_metrics_tooltips: null
             }
         },
+        // Functions bound to watched variables will run every time the watched data is mutated.
         watch: {
+            /**
+             * Toggles the columns from the zing-grid table based on which check boxes have been selected.
+             */
             selected_columns: function () {
                 var diff = this.possible_columns.filter(x => !this.selected_columns.includes(x) );
                 for (var i = 0; i < diff.length; i++) {

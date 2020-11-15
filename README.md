@@ -1,4 +1,5 @@
-# INF5006 Dashboard project
+# INF5006 Dashboard
+This repository contains the code used to create a dashboard representation of the University of Cape Town's African Institute of Financial Markets and Risk Management's (AIFMRM) quarterly Equity Risk Service report.
 
 ## DB and MSSQL server setup
 
@@ -18,7 +19,7 @@ Assuming you've correctly opened the given AIFMRM_ERS database file, you will no
 * industry_portfolio_tooltips.csv
 * portfolio_metrics_tooltips.csv
 * share_metrics_tooltips.csv
-These can be found in the Ballon D'ashboard MSTeams group.
+These can be found in the MSTeams group. Send an email to the UCT AIFMRM to gain access to these files. Note that the files provided here are just a small subset of the overall database. The full dataset will likely not be made available for public use.
 
 To import the csv files as tables, open MS SQL Server Management Studio and do the following:
 1. Right-click on main database `AIFRMR_ERS`
@@ -81,7 +82,8 @@ To make a contribution to the dashboard, please follow the standard github open 
 ### Raising an Issue
 Please provide the following information when raising an issue:
 1. First search the existing issues to make sure that the problem you have detected has not already been reported.
-2. Assuming your issue is _unique_ and _demonstrable_, create a minimum working example to illustrate the problem. Include this test case and your full working environment and setup in your issue.
+2. Assuming your issue is _unique_ and _demonstrable_, create a minimum working example to illustrate the problem. Include this test case and your full working environment and setup in your issue. 
+3. If you are an end-user within the financial industry and simply want to make use of the information in the dashboard rather than self-hosting your own version, a simple explanation of your problem along with some screenshots are sufficient to open an issue.
 
 You should not use issues as a means to:
 1. Request a new feature.
@@ -107,10 +109,16 @@ We always appreciate pull requests, improvements and patches. Here are some basi
 IMPORTANT: By submitting a patch, you agree to allow the project owner to license your work under the same license as that used by the project.
 
 ### Requesting a new feature
-Please see our slack channel.
+Please contact the UCT AIFMRM.
 
+## Future Work
+If you would like to contribute to this project, these are the features that are currently in the pipeline:
+1. Allow users to create customised portfolios of stocks and calculate beta values and other risk measures across their uniquely selected portfolio.
+2. Add a history feature to the downloads tab to store previous request specifications made within a single user session.
+3. Retroactively write automated tests for the webserver once remote hosting and setup is complete.
+4. Add workflows to ensure PEP8 and ESLinter compliance.
 
-## NOTE: Changelog between first and second demo
+## NOTE: Changelog between first and second milestones
 ### Documentation
 Up-to-date README.md with instructions on how to contribute and collaborate.
 
@@ -124,10 +132,16 @@ The following changes were made:
 6. Changed the drop down selectors to a vue-bootstrap component to allow for smoother selection, option resets upon table switching and greyed out instructional text at the top of each dropdown menue.
 
 ### About Page
-We have one now.
+We have one now. It's awesome. Contains full set of instructions for how to use the dashboard, as well as information about the service.
 
 ### Index Metrics Page
-A few words.
+TODO.
+
+### Dashboard Landing Page
+TODO.
 
 ### Testing
 1. Added CI for python tests using github actions.
+
+### Linting and Refactoring
+Basic code cleanup, commenting improvements and style guide compliance.

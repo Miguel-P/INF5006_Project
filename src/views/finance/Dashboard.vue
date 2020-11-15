@@ -106,13 +106,6 @@
                         value="Total Risk"  
                         @click="showTable(totalRiskTableId)" 
                         class="btn btn-info margined-s"/>
-                    <!--<b-icon 
-                        type="button" 
-                        @click="showTable(betasTableId)" 
-                        icon="bootstrap-fill" 
-                        class="md-icon rounded-circle bg-info" 
-                        variant="light">
-                    </b-icon> -->
                 </div>
 
                 <transition name="fade">
