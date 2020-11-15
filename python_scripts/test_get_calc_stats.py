@@ -19,11 +19,14 @@ class TestGet(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # define path variables
-        cls.tables_path = os.path.join(os.getcwd(),"Tables_CSV")
+        # cls.tables_path = os.path.join(os.getcwd(),"Tables_CSV")
 
         # read in indx_tbl and beta_tbl csv files
-        cls.indx_tbl = pd.read_csv(os.path.join(cls.tables_path,"tbl_Index_Constituents.csv"),parse_dates = ["Date"] )
-        cls.beta_tbl = pd.read_csv(os.path.join(cls.tables_path,'tbl_BA_beta_Output.csv'),parse_dates = ["Date"])
+        # cls.indx_tbl = pd.read_csv(os.path.join(cls.tables_path,"tbl_Index_Constituents.csv"),parse_dates = ["Date"] )
+        # cls.beta_tbl = pd.read_csv(os.path.join(cls.tables_path,'tbl_BA_beta_Output.csv'),parse_dates = ["Date"])
+        cls.indx_tbl = pd.read_csv("python_scripts//Tables_CSV//tbl_Index_Constituents.csv",parse_dates = ["Date"] )
+        cls.beta_tbl = pd.read_csv('python_scripts//Tables_CSV//tbl_BA_beta_Output.csv',parse_dates = ["Date"])
+
 
         cls.indx_alpha_codes = cls.indx_tbl["Alpha"].unique()
 
