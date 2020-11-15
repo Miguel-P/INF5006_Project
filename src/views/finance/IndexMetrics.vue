@@ -37,9 +37,9 @@
         <div class="horizontal-no-margin">
             <div class="w50 padding-s">
                 <zing-grid
-                    :caption="metricTableCaption"
                     draggable="columns" 
-                    drag-action="reorder" 
+                    drag-action="reorder"
+                    :id="metricTableId" 
                     :data.prop="metricTableData"
                     layout-controls="disabled"
                     layout="row"
@@ -48,8 +48,8 @@
                     pager
                     sort>
                     <zg-caption>
-                        {{constituentCode+' Total Risk Values'}}
-                        <input type="button" value="Export" @click="exportData(totalRiskTableId)" class="btn btn-info right"/>
+                        Index Beta Metrics
+                        <input type="button" value="Export" @click="exportData(metricTableId)" class="btn btn-info right"/>
                     </zg-caption>
                     <zg-colgroup>
                         <zg-column index="Date" filter="disabled"  width="120"></zg-column>
@@ -88,6 +88,19 @@
             }
         },
         methods: {
+            exportData(gridId){
+                const zgRef = document.getElementById(gridId);
+                const gridData = zgRef.getData({
+                    csv: true,
+                    headers: true,
+                    cols: "visible"
+                });
+                var hiddenElement = document.createElement('a');
+                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(gridData);
+                hiddenElement.target = '_blank';
+                hiddenElement.download = gridId+'.csv';
+                hiddenElement.click();
+            },
             registerGridMethods(){
                 self = this
                 var betaCellFunction = function(openValue, cellDOMRef, cellRef){
@@ -219,6 +232,7 @@
                 results: {},
                 metricTableData: {},
                 metricChartData: {},
+                metricTableId: "metricsTable",
                 metricChartId: "metricChart",
                 metricTableCaption: "Index Metrics",
                 indexCodes: [
@@ -245,8 +259,8 @@
                 metricTypes: [
                     {value: 'Weight', text: 'Weight'},
                     {value: 'Beta', text: 'Beta'},
-                    {value: 'SystemVolatility', text: 'System Volatility'},
-                    {value: 'SpecificVolatility', text: 'Specific Volatility'}
+                    {value: 'SysVol', text: 'System Volatility'},
+                    {value: 'SpecVol', text: 'Specific Volatility'}
                 ],
                 indexCode: 'TOPI',
                 marketProxy: 'J203',

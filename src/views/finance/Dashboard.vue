@@ -88,8 +88,13 @@
                         class="btn btn-info margined-s"/>
                     <input 
                         type="button" 
-                        value="Betas"  
+                        value="Beta"  
                         @click="showTable(betasTableId)" 
+                        class="btn btn-info margined-s"/>
+                    <input 
+                        type="button" 
+                        value="Alpha"  
+                        @click="showTable(alphasTableId)" 
                         class="btn btn-info margined-s"/>
                     <input 
                         type="button" 
@@ -133,11 +138,38 @@
                             </zg-caption>
                             <zg-colgroup>
                                 <zg-column index="Date" filter="disabled"></zg-column>
-                                <zg-column index="J200_BT" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J203_BT" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J250_BT" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J257_BT" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J258_BT" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J200_BT" filter="disabled" cell-class="cellFunction"></zg-column>
+                                <zg-column index="J203_BT" filter="disabled" cell-class="cellFunction"></zg-column>
+                                <zg-column index="J250_BT" filter="disabled" cell-class="cellFunction"></zg-column>
+                                <zg-column index="J257_BT" filter="disabled" cell-class="cellFunction"></zg-column>
+                                <zg-column index="J258_BT" filter="disabled" cell-class="cellFunction"></zg-column>
+                            </zg-colgroup>
+                        </zing-grid>
+                    </div>
+                </transition>
+
+                <transition name="fade">
+                    <div v-if="showAlphas" class="horizontal w100 border">
+                        <zing-grid
+                            :id="alphasTableId"
+                            :data.prop="constituentBetaData"
+                            layout-controls="disabled"
+                            layout="row"
+                            filter 
+                            pager
+                            page-size="7"
+                            sort>
+                            <zg-caption>
+                                {{loadedConstituentCode+' Alpha Values'}}
+                                <input type="button" value="Export" @click="exportData(alphasTableId)" class="btn btn-info right"/>
+                            </zg-caption>
+                            <zg-colgroup>
+                                <zg-column index="Date" filter="disabled"></zg-column>
+                                <zg-column index="J200_AL" filter="disabled" cell-class="cellFunction"></zg-column>
+                                <zg-column index="J203_AL" filter="disabled" cell-class="cellFunction"></zg-column>
+                                <zg-column index="J250_AL" filter="disabled" cell-class="cellFunction"></zg-column>
+                                <zg-column index="J257_AL" filter="disabled" cell-class="cellFunction"></zg-column>
+                                <zg-column index="J258_AL" filter="disabled" cell-class="cellFunction"></zg-column>
                             </zg-colgroup>
                         </zing-grid>
                     </div>
@@ -146,7 +178,7 @@
                 <transition name="fade">
                     <div v-if="showUniqueRisk" class="horizontal w100 border">
                         <zing-grid
-                            :id="betasTableId"
+                            :id="uniqueRiskTableId"
                             :data.prop="constituentBetaData"
                             layout-controls="disabled"
                             layout="row"
@@ -160,11 +192,11 @@
                             </zg-caption>
                             <zg-colgroup>
                                 <zg-column index="Date" filter="disabled"></zg-column>
-                                <zg-column index="J200_UR" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J203_UR" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J250_UR" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J257_UR" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J258_UR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J200_UR" filter="disabled"></zg-column>
+                                <zg-column index="J203_UR" filter="disabled"></zg-column>
+                                <zg-column index="J250_UR" filter="disabled"></zg-column>
+                                <zg-column index="J257_UR" filter="disabled"></zg-column>
+                                <zg-column index="J258_UR" filter="disabled"></zg-column>
                             </zg-colgroup>
                         </zing-grid>
                     </div>
@@ -173,7 +205,7 @@
                 <transition name="fade">
                     <div v-if="showTotalRisk" class="horizontal w100 border">
                         <zing-grid
-                            :id="betasTableId"
+                            :id="totalRiskTableId"
                             :data.prop="constituentBetaData"
                             layout-controls="disabled"
                             layout="row"
@@ -187,11 +219,11 @@
                             </zg-caption>
                             <zg-colgroup>
                                 <zg-column index="Date" filter="disabled"></zg-column>
-                                <zg-column index="J200_TR" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J203_TR" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J250_TR" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J257_TR" filter="disabled" cell-class="betaCellFunction"></zg-column>
-                                <zg-column index="J258_TR" filter="disabled" cell-class="betaCellFunction"></zg-column>
+                                <zg-column index="J200_TR" filter="disabled"></zg-column>
+                                <zg-column index="J203_TR" filter="disabled"></zg-column>
+                                <zg-column index="J250_TR" filter="disabled"></zg-column>
+                                <zg-column index="J257_TR" filter="disabled"></zg-column>
+                                <zg-column index="J258_TR" filter="disabled"></zg-column>
                             </zg-colgroup>
                         </zing-grid>
                     </div>
@@ -456,22 +488,32 @@
                         self.filter()
                     }
                 }
-                var betaCellFunction = function(openValue, cellDOMRef, cellRef){
-                    var beta = parseFloat(openValue)
-                    if (beta > 1){
-                        return 'red'
-                    }
+                var cellFunction = function(openValue, cellDOMRef, cellRef){
+                    var value = parseFloat(openValue)
+                    if (this.showBetas){
+                        if (value > 1){
+                            return 'red'
+                        }
 
-                    if (beta <= 1 && beta >= 0){
-                        return 'green'
-                    }
+                        if (value <= 1 && value >= 0){
+                            return 'green'
+                        }
 
-                    return 'orange';
+                        return 'orange';
+                    }else if (this.showAlphas){
+                        if (value > 0){
+                            return 'green'
+                        }
+
+                        if (value < 0){
+                            return 'red'
+                        }
+                    }
                 }
 
                 // set up zinggrid
                 this.zinggrid = document.querySelector('zing-grid')
-                ZingGrid.registerMethod(betaCellFunction, 'betaCellFunction', this)
+                ZingGrid.registerMethod(cellFunction, 'cellFunction', this)
             },
             plotIndexData(){
                 var data = this.results
@@ -625,6 +667,7 @@
                 showAlphas: false,
                 pieChartId: "pieChart",
                 betasTableId: "betasGrid",
+                alphasTableId: "alphasGrid",
                 uniqueRiskTableId: "uniqueRiskGrid",
                 totalRiskTableId: "totalRiskGrid",
                 showBetasText: "Show Beta Table",

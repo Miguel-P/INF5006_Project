@@ -61,7 +61,7 @@
           },
           {
             href: '/downloads',
-            title: 'Downloads',
+            title: 'Custom Tables',
             icon: 'fa fa-download',
           }
         ]
@@ -72,4 +72,5 @@
 
 <style>
   @import './assets/css/style.css';
+  @import './assets/css/templatemo-style.css';
 </style>

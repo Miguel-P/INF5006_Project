@@ -1,6 +1,6 @@
 import {sequelize} from '../api/config/db';
 var IndexConstituentModel = require('../model/index_constituent-model').default;
-var IndexMetricModel = require('../model/index_metric-model').default;
+var IndexMetricModel = require('../model/industry-portf-model').default;
 var IndexModel = require('../model/index-model').default;
 var BetaModel = require('../model/beta-model').default;
 var IndexConstituentRep = require('./index_constituent-repository').default;
@@ -206,13 +206,13 @@ class Index {
     static async getIndexMetricData(metricType, indexCode, marketIndexCode) {
         var results = {"success":0};
         results["data"] = {}
-        var getAttributes = ['Date','IndexCode','MarketIndexCode','Industry', metricType]
+        var getAttributes = ['Date','IndexCode','MarketIndex','Industry', metricType]
         
         await IndexMetricModel.findAll({
             attributes: getAttributes,
             where: {
                 IndexCode: indexCode,
-                MarketIndexCode: marketIndexCode
+                MarketIndex: marketIndexCode
             }
         })
         .then(function(indexMetrics) {

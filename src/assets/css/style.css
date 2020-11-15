@@ -41,6 +41,10 @@ div#custom-home {
     align-items: center;
 }
 
+.icon-lg{
+    width: 50%;
+}
+
 .nav-logo {
     height: 30px;
 }
