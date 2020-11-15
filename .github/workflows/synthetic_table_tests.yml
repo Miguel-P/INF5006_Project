@@ -1,0 +1,43 @@
+name: synthetic_table_tests
+
+on:
+   # Run tests on every push.
+   push
+
+jobs:
+  run_tests:
+
+      runs-on: ubuntu-20.04
+
+      strategy:
+        # Prevent all build to stop if a single one fails
+        fail-fast: false
+
+      steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+  
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Upload test data1
+        uses: actions/upload-artifact@v2
+        with:
+          name: Tables_CSV/tbl_Index_Constituents.csv
+          path: python_scripts/Tables_CSV/tbl_Index_Constituents.csv
+
+      - name: Upload test data2
+        uses: actions/upload-artifact@v2
+        with:
+          name: Tables_CSV/tbl_BA_beta_Output.csv
+          path: python_scripts/Tables_CSV/tbl_BA_beta_Output.csv
+
+      - name: Run benchmarking tests
+        run: |
+          python python_scripts/test_get_calc_stats.py
