@@ -123,7 +123,7 @@
             <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6">
                 <div class="tm-flex-center p-5">
                     <div class="tm-md-flex-center">
-                        <h2 class="tm-text-color-primary mb-4">Downloads</h2>
+                        <h2 class="tm-text-color-primary mb-4">Custom Tables</h2>
                         <p class="mb-4">
                             A page that allows you to access any of the other tables of data and 
                             customize which columns to view. The user has the option of 
