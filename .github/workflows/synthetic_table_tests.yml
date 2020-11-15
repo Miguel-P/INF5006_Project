@@ -26,18 +26,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r ./python_scripts/requirements.txt
 
-      - name: Upload test data1
-        uses: actions/upload-artifact@v2
-        with:
-          name: tbl_Index_Constituents.csv
-          path: python_scripts/Tables_CSV/tbl_Index_Constituents.csv
-
-      - name: Upload test data2
-        uses: actions/upload-artifact@v2
-        with:
-          name: tbl_BA_beta_Output.csv
-          path: python_scripts/Tables_CSV/tbl_BA_beta_Output.csv
-
       - name: Run benchmarking tests
         run: |
           python python_scripts/test_get_calc_stats.py

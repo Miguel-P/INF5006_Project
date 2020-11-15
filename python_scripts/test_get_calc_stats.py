@@ -19,8 +19,7 @@ class TestGet(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # define path variables
-        # remove folder outer folder path "Tables_CSV" for github actions
-        cls.tables_path = os.path.join(os.getcwd(),"")
+        cls.tables_path = os.path.join(os.getcwd(),"Tables_CSV")
 
         # read in indx_tbl and beta_tbl csv files
         cls.indx_tbl = pd.read_csv(os.path.join(cls.tables_path,"tbl_Index_Constituents.csv"),parse_dates = ["Date"] )
