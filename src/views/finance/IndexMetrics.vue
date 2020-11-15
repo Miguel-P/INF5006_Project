@@ -9,24 +9,42 @@
             <div class="horizontal w100">
                 <div class="w20">
                     <model-select
+                        id="selectIndex"
                         :options="indexCodes"
                         v-model="indexCode"
                         placeholder="Select Index">
                     </model-select>
+                    <b-tooltip 
+                        target="selectIndex" 
+                        placement="left"
+                        title="select index to view metrics for">
+                    </b-tooltip>
                 </div>
                 <div class="w20">
                     <model-select 
+                        id="selectMktProxy"
                         :options="marketProxies"
                         v-model="marketProxy"
                         placeholder="Select Market Proxy">
                     </model-select>
+                    <b-tooltip 
+                        target="selectMktProxy" 
+                        placement="left"
+                        title="select market proxy to decompose for">
+                    </b-tooltip>
                 </div>
                 <div class="w20">
                     <model-select 
+                        id="selectMetricType"
                         :options="metricTypes"
                         v-model="metricType"
                         placeholder="Select Metric">
                     </model-select>
+                    <b-tooltip 
+                        target="selectMetricType" 
+                        placement="right"
+                        title="select the metric type to view">
+                    </b-tooltip>
                 </div>
                 <div class="w20">
                     <input type="button" value="Get Metrics"  @click="getMetricData()" class="btn btn-info w60"/>

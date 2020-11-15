@@ -10,47 +10,83 @@
                     <div class="horizontal w100">
                         <div class="w20">
                             <b-form-select
+                                id="selectTable"
                                 disabled-field="notEnabled"
                                 :options="tables"
                                 v-model="table"
                                 placeholder="Select Table">
                             </b-form-select>
+                            <b-tooltip 
+                                target="selectTable" 
+                                placement="left"
+                                title="select type of information to tabulate">
+                            </b-tooltip>
                         </div>
                         <div class="w20" v-if="index_codes_req">  
                             <b-form-select
-                                    :options="index_codes"
-                                    v-model="index_code"
-                                    placeholder="Select Index Code">
+                                id="selectIndex"
+                                :options="index_codes"
+                                v-model="index_code"
+                                placeholder="Select Index Code">
                             </b-form-select>
+                            <b-tooltip 
+                                target="selectIndex" 
+                                placement="left"
+                                title="select index to tabulate for">
+                            </b-tooltip>
                         </div>
                         <div class="w20">  
                             <b-form-select 
+                                id="selectMktProxy"
                                 :options="marketProxies"
                                 v-model="marketProxy"
                                 placeholder="Select Market Proxy">
                             </b-form-select>
+                            <b-tooltip 
+                                target="selectMktProxy" 
+                                placement="left"
+                                title="select market proxy">
+                            </b-tooltip>
                         </div>
                         <div class="w20" v-if="share_codes_req"> 
                             <b-form-select 
+                                id="selectShare"
                                 :options="share_codes"
                                 v-model="share_code"
                                 placeholder="Select Share Code">
                             </b-form-select>
+                            <b-tooltip 
+                                target="selectShare" 
+                                placement="left"
+                                title="select the share to show">
+                            </b-tooltip>
                         </div>
                         <div class="w20">
                             <b-form-select 
+                                id="selectDate"
                                 :options="dates"
                                 v-model="date"
                                 placeholder="Select Date">
                             </b-form-select>
+                            <b-tooltip 
+                                target="selectDate" 
+                                placement="left"
+                                title="select beta calculation date">
+                            </b-tooltip>
                         </div>
 
                         <div class="w20">
                             <b-form-select 
+                                id="selectPeriod"
                                 :options="periods"
                                 v-model="period"
                                 placeholder="Select Period">
                             </b-form-select>
+                            <b-tooltip 
+                                target="selectPeriod" 
+                                placement="left"
+                                title="select period to show data from">
+                            </b-tooltip>
                         </div>
                     </div>
                     <div class="w100 margined">

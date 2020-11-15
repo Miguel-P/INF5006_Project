@@ -9,17 +9,29 @@
             <div class="horizontal w100">
                 <div class="w20">
                     <model-select
+                        id="selectTable"
                         :options="tables"
                         v-model="table"
                         placeholder="Select Table">
                     </model-select>
+                    <b-tooltip 
+                        target="selectTable" 
+                        placement="left"
+                        title="select data type to view betas for">
+                    </b-tooltip>
                 </div>
                 <div class="w20">
                     <model-select 
+                        id="selectPeriod"
                         :options="dates"
                         v-model="date"
                         placeholder="Select Period">
                     </model-select>
+                    <b-tooltip 
+                        target="selectPeriod" 
+                        placement="left"
+                        title="select beta calculation date">
+                    </b-tooltip>
                 </div>
                 <div class="w20">
                     <input type="button" value="Get Data"  @click="getBetaData()" class="btn btn-info w60"/>
