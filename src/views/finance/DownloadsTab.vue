@@ -69,7 +69,8 @@
                           :options="possible_columns"
                         ></b-form-checkbox-group>
                     </b-form-group>
-                <zing-grid id="downloads_table" :data.prop="gridData" filter sort pager></zing-grid>
+                <zing-grid id="downloads_table" :data.prop="gridData" filter sort pager>
+                </zing-grid>
              </div>
         </div>
     </div>
@@ -82,6 +83,9 @@
     import Sidebar from '@/components/Sidebar'
     import {Circle9} from 'vue-loading-spinner'
 
+    // const ZG = document.querySelector('#downloads_table');
+    // ZG.registerMethod('tooltips', renderTooltip);
+
     export default {
         components: {
             ModelSelect,
@@ -90,6 +94,30 @@
             Circle9
         },
         methods: {
+            renderTooltip: function() {
+
+                let zgRef = document.querySelector('#downloads_table');
+
+                if (this.table == "sharesMetrics"){
+                   var tooltip_data = this.share_metrics_tooltips
+
+                }
+                else if (this.table == "portfMetrics") {
+                    var tooltip_data =  this.portfolio_metrics_tooltips
+
+
+                }
+                else if (this.table == "indusPortfMetrics"){
+                    var tooltip_data =  this.industry_portfolio_metrics_tooltips
+                }
+
+                for (var i = 0; i < tooltip_data.length; i++) {
+                    console.log(tooltip_data[i].column_name)
+                    let zgColumn = zgRef.querySelector('zg-column[index="'+tooltip_data[i].column_name+'"]');
+                    zgColumn.setAttribute('header-tooltip-text', tooltip_data[i].description)
+                    zgColumn.setAttribute('header-tooltip-trigger', "text")
+                }
+            },
             downloadTable: function() {
                 console.log("Downloading table")
                 const data = downloads_table.getData({
@@ -144,6 +172,12 @@
                 )
                 return await response
             },
+            getSharesMetricsTooltips: async function() {
+                let response = await axios.get(
+                            'http://localhost:3000/api/tooltips/shares_metrics'
+                )
+                return await response
+            },
             getPortfMetrics: async function() {
                 let response = await axios.get(
                             'http://localhost:3000/api/downloads/'+
@@ -151,6 +185,18 @@
                             this.marketProxy + "/" +
                             'date/'+this.date+
                             '/period/'+this.period
+                )
+                return await response
+            },
+            getPortfMetrics_tooltips: async function() {
+                let response = await axios.get(
+                            'http://localhost:3000/api/tooltips/portfolio_metrics'
+                )
+                return await response
+            },
+            getIndustryPortfMetrics_tooltips: async function() {
+                let response = await axios.get(
+                            'http://localhost:3000/api/tooltips/industry_portfolio'
                 )
                 return await response
             },
@@ -176,9 +222,24 @@
                 return await response
             },
             createTable: function(){
+                // first check the invariants and return if false
+                if (this.table == null) {
+                    alert("Please select all of the options before creating the table.")
+                    return
+                }
+                
                 this.loading = true
                 this.loaded = false
+
                 if (this.table == "sharetable" | this.table == "indextable"){
+                    // check that all of the data we need to request the table is present
+                    // if not, create an alert and exit gracefully.
+                    if (this.marketProxy == null | this.date == null | this.period == null){
+                        alert("Please select all of the options before creating the table.")
+                        this.loading = false
+                        return
+                    }
+                    // if everything fine, fetch the data and create the table.
                     this.getStandardTables()
                     .then(response => {
                         this.loading = false
@@ -191,33 +252,78 @@
                     })
                 }
                 else if (this.table == "sharesMetrics"){
+                    if (this.index_code == null | this.marketProxy == null | this.share_code == null |
+                        this.date == null | this.period == null){
+                        alert("Please select all of the options before creating the table.")
+                        this.loading = false
+                        return
+                    }
                     this.getSharesMetrics()
                     .then(response => {
                         this.loading = false
                         console.log("Table data = ", response.data.message[0])
                         this.gridData = response.data.message
                         this.makeColumnSelectors(response)
+                        this.getSharesMetricsTooltips()
+                        .then(response => {
+                            this.share_metrics_tooltips = response.data["message"]
+                        })
+                        .then(
+                            this.renderTooltip()
+                        )
                     })
                     .catch(e => {
                         console.log(e)
                     })
                 }
                 else if (this.table == "portfMetrics"){
+                    if (this.marketProxy == null | this.date == null | this.period == null){
+                        alert("Please select all of the options before creating the table.")
+                        this.loading = false
+                        return
+                    }
                     this.getPortfMetrics()
                     .then(response => {
                         this.loading = false
                         console.log("Table data = ", response.data.message[0])
                         this.gridData = response.data.message
                         this.makeColumnSelectors(response)
+                        this.getPortfMetrics_tooltips()
+                        .then(response => {
+                            this.portfolio_metrics_tooltips = response.data["message"]
+                        })
+                        .then(
+                            console.log(this.portfolio_metrics_tooltips),
+                            this.renderTooltip()
+                        )
+                    })
+                    .catch(e => {
+                        console.log(e)
                     })
                 }
                 else {
+                    if (this.index_code == null | this.marketProxy == null |
+                        this.date == null | this.period == null){
+                        alert("Please select all of the options before creating the table.")
+                        this.loading = false
+                        return
+                    }
                     this.getIndusPortfMetrics()
                     .then(response => {
                         this.loading = false
                         console.log("Table data = ", response.data.message[0])
                         this.gridData = response.data.message
                         this.makeColumnSelectors(response)
+                        this.getIndustryPortfMetrics_tooltips()
+                        .then(response => {
+                            this.industry_portfolio_metrics_tooltips = response.data["message"]
+                        })
+                        .then(
+                            this.renderTooltip()
+                        )
+                    })
+                    .catch(e => {
+                        console.log(e)
                     })
                 }
             }
@@ -308,6 +414,7 @@
                 period: null,
                 share_codes: [
                     {value: null, text: 'Please Select Share Code', notEnabled: true},
+                    {value: "View All", text: "View All"}
                 ],
                 share_code: null,
                 index_codes: [
@@ -317,7 +424,10 @@
                 selected_columns: [],
                 possible_columns: [],
                 share_codes_req: false,
-                index_codes_req: false
+                index_codes_req: false,
+                portfolio_metrics_tooltips: null,
+                industry_portfolio_metrics_tooltips: null,
+                share_metrics_tooltips: null
             }
         },
         watch: {
@@ -353,6 +463,15 @@
                     this.share_codes_req = false
                     this.index_codes_req = false
                 }
+            },
+            portfolio_metrics_tooltips: function () {
+                this.renderTooltip();
+            },
+            industry_portfolio_metrics_tooltips: function () {
+                this.renderTooltip();
+            }, 
+            share_metrics_tooltips: function () {
+                this.renderTooltip();
             }
         }
     }

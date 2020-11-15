@@ -5,6 +5,7 @@ import authRoutes from './api/auth/auth-routes';
 import constituentRoutes from './api/index_constituent/index_constituent-routes';
 import indexRoutes from './api/index/index-routes';
 import downloadRoutes from './api/downloadsTable/download-routes';
+import tooltipRoutes from './api/tooltips/tooltip_routes'
 
 export function registerRoutes(app) {
     app.use('/api', taskRoutes);
@@ -14,4 +15,5 @@ export function registerRoutes(app) {
     app.use('/api', constituentRoutes);
     app.use('/api', indexRoutes);
     app.use('/api', downloadRoutes);
+    app.use('/api', tooltipRoutes);
 }
