@@ -26,6 +26,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r ./python_scripts/requirements.txt
 
-      - name: Run benchmarking tests
+      - name: Run tests
         run: |
           python python_scripts/test_get_calc_stats.py
